@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import TeamCard from "../components/TeamCard.jsx";
 import { Loader, ErrorPanel } from "../components/Status.jsx";
 import gifLoading from "../components/assets/vecteezy_loading-bar-progress-with-green-color-vector-illustration_14945926.svg";
+import Toastify from "toastify-js";
+import axios from "axios";
 
 const PAGE_STEP = 18;
 
@@ -14,16 +16,17 @@ export default function TeamsPage({ onSelect }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_STEP);
-  // const [teams, setTeams] = useState({
-  //   name: "",
-  //   code: "",
-  //   logo: "",
-  //   founded: 0,
-  //   stadium: "",
-  //   city: "",
-  //   capacity: 0,
-  //   image: "",
-  // });
+  const [teamChoose, setTeamChoose] = useState({
+    name: "",
+    code: "",
+    logo: "",
+    founded: 0,
+    stadium: "",
+    city: "",
+    capacity: 0,
+    image: "",
+  });
+  // const [teamName, setTeamName] = useState()
 
   async function fetchTeams() {
     try {
@@ -45,6 +48,110 @@ export default function TeamsPage({ onSelect }) {
       console.error(error);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleJoin(e, infoId) {
+    try {
+      // e.preventDefault();
+      setLoading(true);
+      const result = await fetch(
+        `https://v3.football.api-sports.io/teams?id=${infoId}`,
+        {
+          method: "GET",
+          headers: {
+            "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
+          },
+        },
+      );
+
+      const data = await result.json();
+      postJoin(e, data.response);
+      Toastify({
+        text: "Success Join Clubs",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+          background: "#34D399",
+          color: "black",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    } catch (error) {
+      console.log(error);
+      Toastify({
+        text: "Data not found",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+          background: "#F87171",
+          color: "black",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    }
+  }
+
+  async function postJoin(e, team) {
+    try {
+      e.preventDefault();
+      setTeamChoose({ name: team.team.name });
+      setTeamChoose({ code: team.team.code });
+      setTeamChoose({ logo: team.team.logo });
+      setTeamChoose({ founded: team.team.founded });
+      setTeamChoose({ stadium: team.team.stadium });
+      setTeamChoose({ city: team.team.city });
+      setTeamChoose({ capacity: team.team.capacity });
+      setTeamChoose({ image: team.team.image });
+
+      await axios.post(
+        `/`,
+        { teamChoose },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.access_token}`,
+          },
+        },
+      );
+
+      Toastify({
+        text: "Success Join Clubs",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+          background: "#34D399",
+          color: "black",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    } catch (error) {
+      console.log(error);
+      Toastify({
+        text: "Data not found",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+          background: "#F87171",
+          color: "black",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
     }
   }
 
@@ -179,7 +286,8 @@ export default function TeamsPage({ onSelect }) {
                     // key={team.team?.id}
                     key={team.id}
                     team={team}
-                    // onClick={() => onSelect(team)}
+                    handleJoin={handleJoin}
+                    onClick={() => onSelect(team)}
                   />
                 ))}
               </div>

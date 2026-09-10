@@ -14,7 +14,7 @@ import {
 import TeamsPage from "./pages/TeamsPage.jsx";
 import PlayersPage from "./pages/PlayersPage.jsx";
 import PlayerProfilePage from "./pages/PlayerProfilePage.jsx";
-import MyTeamsPage from "./pages/MyTeamsPage.jsx";
+// import MyTeamsPage from "./pages/MyTeamsPage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import UpdatePage from "./pages/UpdatePage.jsx";
@@ -104,21 +104,24 @@ function ProfileRoute() {
 export default function App() {
   return (
     <>
-      <Routes>
-        {/* <Route path="/" element={<TeamsPage onSelect={openSquad} />} /> */}
-        <Route element={<BaseLayout />}>
-          <Route path="/" element={<TeamsPage />} />
+      <BrowserRouter>
+        <Routes>
+          {/* <Route path="/" element={<TeamsPage onSelect={openSquad} />} /> */}
+          <Route element={<BaseLayout />}>
+            <Route path="/" element={<TeamsPage />} />
 
-          <Route path="/teams/:teamId" element={<SquadRoute />} />
-          <Route path="/players/:playerId" element={<ProfileRoute />} />
-          <Route
+            {/* <Route path="/:teamId" element={<SquadRoute />} /> */}
+            <Route path="/:teamId" element={<PlayersPage />} />
+
+            <Route path="/players/:playerId" element={<ProfileRoute />} />
+            {/* <Route
             path="/my-teams"
             element={<MyTeamsPage />}
             // element={<MyTeamsPage onSelect={openSquad} onBrowse={goTeams} />}
-          />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          {/* <Route
+          /> */}
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            {/* <Route
             path="/update"
             element={
               <UpdatePage
@@ -131,9 +134,10 @@ export default function App() {
               />
             }
           /> */}
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </>
   );
 }

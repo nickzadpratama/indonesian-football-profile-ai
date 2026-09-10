@@ -12,12 +12,12 @@ import {
  * Team card for the teams list. The cover + details navigate to the squad;
  * the vote button toggles a ★-style upvote with a visible effect when voted.
  */
-export default function TeamCard({ team, onUpdate }) {
+export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
   const info = team.team ?? {};
   const venue = team.venue ?? {};
   const teamId = info.id;
 
-  const [voted, setVoted] = useState(() => hasVoted(teamId));
+  const [voted, setVoted] = useState();
   const [popTick, setPopTick] = useState(0);
 
   useEffect(() => onVotesChange(() => setVoted(hasVoted(teamId))), [teamId]);
@@ -123,7 +123,7 @@ export default function TeamCard({ team, onUpdate }) {
         <div className="flex flex-wrap items-center gap-1.5">
           <button
             type="button"
-            // onClick={onClick}
+            onClick={onClick}
             className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 ring-1 ring-white/10 transition hover:bg-white/15 hover:text-emerald-300"
           >
             View squad
@@ -148,7 +148,7 @@ export default function TeamCard({ team, onUpdate }) {
 
         <button
           type="button"
-          onClick={handleVote}
+          onClick={(e) => handleJoin(e, info.id)}
           aria-pressed={voted}
           aria-label={`${voted ? "Unvote" : "Vote"} for ${info.name}`}
           title={`${voted ? "Remove your vote from" : "Vote for"} ${info.name}`}
