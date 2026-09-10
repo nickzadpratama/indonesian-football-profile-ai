@@ -1,29 +1,60 @@
-import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { login } from '../auth/store.js'
-import FormField from '../components/FormField.jsx'
-import { toast } from '../toast.js'
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { login } from "../auth/store.js";
+import FormField from "../components/FormField.jsx";
+import { toast } from "../toast.js";
+import Toastify from "toastify-js";
+import axios from "axios";
 
 /** Sign-in form backed by the local auth store. Redirects back to where the user came from. */
 export default function LoginPage() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const navigate = useNavigate()
-  const location = useLocation()
-  const from = location.state?.from ?? "/"
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from ?? "/";
 
-  const submit = (event) => {
-    event.preventDefault();
-    const result = login({ email: email.trim(), password });
-    if (!result.ok) {
-      setError(result.error);
-      toast(result.error, "error");
-      return;
+  async function handleLogin(e) {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(`/login`, { email, password });
+
+      localStorage.setItem("access_token", data.access_token);
+      navigate("/");
+      Toastify({
+        text: "Success login",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+          background: "#34D399",
+          color: "black",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    } catch (error) {
+      console.log(error);
+      Toastify({
+        text: "Failed login",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+          background: "#F87171",
+          color: "black",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
     }
-    toast(`Welcome back, ${result.user.name}!`, "success");
-    navigate(from, { replace: true });
-  };
+    e.preventDefault();
+  }
 
   return (
     <section className="pt-10">
@@ -39,13 +70,13 @@ export default function LoginPage() {
             Welcome back — access your Football Hub.
           </p>
 
-          <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
+          <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-4">
             <FormField
               id="login-email"
               label="Email"
               type="email"
               value={email}
-              onChange={setEmail}
+              onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
             />
@@ -54,7 +85,7 @@ export default function LoginPage() {
               label="Password"
               type="password"
               value={password}
-              onChange={setPassword}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               autoComplete="current-password"
             />
@@ -78,7 +109,7 @@ export default function LoginPage() {
             New here?{" "}
             <button
               type="button"
-              onClick={() => navigate('/register', { state: { from } })}
+              onClick={() => navigate("/register", { state: { from } })}
               className="font-bold text-emerald-300 hover:underline"
             >
               Create an account

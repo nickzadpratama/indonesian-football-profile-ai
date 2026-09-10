@@ -5,13 +5,16 @@ import { Loader, ErrorPanel } from "../components/Status.jsx";
 import gifLoading from "../components/assets/vecteezy_loading-bar-progress-with-green-color-vector-illustration_14945926.svg";
 import Toastify from "toastify-js";
 import axios from "axios";
+import { fetchTeams } from "../features/todo/todoSlice.js";
+import { useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 
 const PAGE_STEP = 18;
 
 export default function TeamsPage({ onSelect }) {
-  const [teams, setTeams] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  // const [teams, setTeams] = useState([]);
+  // const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(null);
   const [phase, setPhase] = useState("loading"); // 'loading' | 'ok' | 'error'
   const [reloadKey, setReloadKey] = useState(0);
   const [query, setQuery] = useState("");
@@ -26,30 +29,32 @@ export default function TeamsPage({ onSelect }) {
     capacity: 0,
     image: "",
   });
+  const dispatch = useDispatch();
   // const [teamName, setTeamName] = useState()
+  const { todos, loading, error } = useSelector((state) => state.todo);
 
-  async function fetchTeams() {
-    try {
-      setLoading(true);
-      const result = await fetch(
-        "https://v3.football.api-sports.io/teams?country=indonesia",
-        {
-          method: "GET",
-          headers: {
-            "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-          },
-        },
-      );
+  // async function fetchTeams() {
+  //   try {
+  //     setLoading(true);
+  //     const result = await fetch(
+  //       "https://v3.football.api-sports.io/teams?country=indonesia",
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
+  //         },
+  //       },
+  //     );
 
-      const data = await result.json();
-      setTeams(data.response);
-      console.log(data.response, teams);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }
+  //     const data = await result.json();
+  //     setTeams(data.response);
+  //     console.log(data.response, teams);
+  //   } catch (error) {
+  //     console.error(error);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
   async function handleJoin(e, infoId) {
     try {
@@ -178,21 +183,26 @@ export default function TeamsPage({ onSelect }) {
     fetchTeams();
   }
 
-  const reload = () => {
-    setPhase("loading");
-    setVisible(PAGE_STEP);
-    setReloadKey((key) => key + 1);
-  };
+  // const reload = () => {
+  //   setPhase("loading");
+  //   setVisible(PAGE_STEP);
+  //   setReloadKey((key) => key + 1);
+  // };
 
   const term = query.trim().toLowerCase();
-  const filtered = (teams ?? []).filter((t) => {
+  const filtered = (todos ?? []).filter((t) => {
     if (!term) return true;
     const teamName = t.team?.name?.toLowerCase() || "";
     return teamName.includes(term);
   });
 
+  // useEffect(() => {
+  //   fetchTeams();
+  // }, []);
+
   useEffect(() => {
-    fetchTeams();
+    // fetchPlayer();
+    dispatch(fetchTeams());
   }, []);
 
   return (

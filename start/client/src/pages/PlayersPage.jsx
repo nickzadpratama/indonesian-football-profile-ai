@@ -13,7 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 //   setErrorProduct,
 //   fetchData,
 // } from "../features/product/productSlice";
-import { fetchTeams } from "../features/todo/todoSlice.js";
+import { fetchPlayers, fetchTeam } from "../features/todo/todoSlice.js";
 import { useParams } from "react-router-dom";
 
 // export default function PlayersPage({
@@ -23,52 +23,48 @@ import { useParams } from "react-router-dom";
 //   season: initialSeason,
 // }) {
 
-export default function PlayersPage({
-  team,
-  onBack,
-  onSelect,
-  season: initialSeason,
-}) {
-  const [players, setPlayers] = useState([]);
+export default function PlayersPage() {
+  // const [players, setPlayers] = useState([]);
 
-  const { todos, loading, error } = useSelector((state) => state.todoReducer);
-  // const info = todos.team ?? {};
-  // const venue = todos.venue ?? {};
+  const { todos, loading, error } = useSelector((state) => state.todo);
+  const players = todos.players;
+  // console.log(todos);
+  const info = todos.team ?? {};
+  const venue = todos.venue ?? {};
   const [squad, setSquad] = useState(null);
   // const [error, setError] = useState(null);
   const [phase, setPhase] = useState("loading"); // 'loading' | 'ok' | 'error'
   const [reloadKey, setReloadKey] = useState(0);
-  const [season, setSeason] = useState(
-    initialSeason ?? SEASON_YEARS.find((y) => y !== PREMIUM_ONLY_YEAR),
-  );
+  const [season, setSeason] = useState();
+
   // const [loading, setLoading] = useState(false);
   const { teamId } = useParams();
   const dispatch = useDispatch();
 
-  async function fetchPlayer() {
-    try {
-      console.log(teamId);
-      setLoading(true);
-      const result = await fetch(
-        "https://v1.basketball.api-sports.io/players",
-        {
-          method: "GET",
-          headers: {
-            "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-          },
-        },
-      );
+  // async function fetchPlayer() {
+  //   try {
+  //     console.log(teamId);
+  //     setLoading(true);
+  //     const result = await fetch(
+  //       "https://v1.basketball.api-sports.io/players",
+  //       {
+  //         method: "GET",
+  //         headers: {
+  //           "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
+  //         },
+  //       },
+  //     );
 
-      const data = await result.json();
-      setPlayers(data.response);
-      console.log(data.response);
-    } catch (error) {
-      console.error(error);
-    }
-    // finally {
-    //   setLoading(false);
-    // }
-  }
+  //     const data = await result.json();
+  //     setPlayers(data.response);
+  //     console.log(data.response);
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  //   // finally {
+  //   //   setLoading(false);
+  //   // }
+  // }
 
   // useEffect(() => {
   //   let cancelled = false;
@@ -97,8 +93,9 @@ export default function PlayersPage({
   // const players = squad?.players ?? [];
 
   useEffect(() => {
-    fetchPlayer();
-    // dispatch(fetchTeams(teamId));
+    // fetchPlayer();
+    // dispatch(fetchTeam(teamId));
+    dispatch(fetchPlayers(teamId));
   }, []);
 
   return (
@@ -142,7 +139,7 @@ export default function PlayersPage({
             <div className="relative flex flex-wrap items-center gap-4 px-5 py-5">
               <button
                 type="button"
-                onClick={onBack}
+                // onClick={onBack}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white/10 text-slate-200 ring-1 ring-white/20 transition hover:bg-white/20"
                 aria-label="Back to teams"
               >
@@ -203,7 +200,7 @@ export default function PlayersPage({
                   <PlayerCard
                     key={player.id}
                     player={player}
-                    onClick={() => onSelect(player, season)}
+                    // onClick={() => onSelect(player, season)}
                   />
                 ))}
               </div>

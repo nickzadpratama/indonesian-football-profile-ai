@@ -7,6 +7,7 @@ import {
   onVotesChange,
   toggleVote,
 } from "../data/votes.js";
+import { Link } from "react-router-dom";
 
 /**
  * Team card for the teams list. The cover + details navigate to the squad;
@@ -121,19 +122,20 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
       {/* ── Footer: navigate + vote ───────────────── */}
       <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-black/10 px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
-          <button
-            type="button"
-            onClick={onClick}
-            className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 ring-1 ring-white/10 transition hover:bg-white/15 hover:text-emerald-300"
-          >
-            View squad
-            <span
-              aria-hidden="true"
-              className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+          <Link to={`/${info.id}`}>
+            <div
+              type="button"
+              className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 ring-1 ring-white/10 transition hover:bg-white/15 hover:text-emerald-300"
             >
-              →
-            </span>
-          </button>
+              View squad
+              <span
+                aria-hidden="true"
+                className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+              >
+                →
+              </span>
+            </div>
+          </Link>
           {onUpdate && (
             <button
               type="button"
