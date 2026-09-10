@@ -46,7 +46,7 @@ function StatGroup({ title, tiles }) {
 }
 
 export default function PlayerProfilePage({ player, team, onBack, season, onSelectSeason }) {
-  const info = team.team ?? {}
+  const info = team?.team ?? {}
   const [profile, setProfile] = useState(null)
   const [error, setError] = useState(null)
   const [phase, setPhase] = useState('loading') // 'loading' | 'ok' | 'error'
@@ -114,7 +114,7 @@ export default function PlayerProfilePage({ player, team, onBack, season, onSele
             <p className="flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
               <span>Player profile</span>
               <span className="text-slate-700">·</span>
-              <span>{info.name ?? team}</span>
+              <span>{info.name ?? '—'}</span>
             </p>
             <h1 className="mt-0.5 truncate text-2xl font-black tracking-tight text-white">
               {detail.name ?? player.name}

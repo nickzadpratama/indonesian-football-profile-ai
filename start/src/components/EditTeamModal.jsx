@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import FormField from './FormField.jsx'
+import { toast } from '../toast.js'
 
 /**
  * Modal dialog to update one team's value fields. The team entry is
@@ -30,17 +31,23 @@ export default function EditTeamModal({ team, onSave, onClose }) {
     event.preventDefault()
     const cleanedName = name.trim()
     if (cleanedName.length < 2) {
-      setError('Team name must be at least 2 characters.')
+      const message = 'Team name must be at least 2 characters.'
+      setError(message)
+      toast(message, 'error')
       return
     }
     const foundedNum = founded.trim() === '' ? null : Number(founded)
     if (foundedNum !== null && (Number.isNaN(foundedNum) || foundedNum < 1800 || foundedNum > 2100)) {
-      setError('Founded year looks invalid (1800–2100).')
+      const message = 'Founded year looks invalid (1800–2100).'
+      setError(message)
+      toast(message, 'error')
       return
     }
     const capacityNum = capacity.trim() === '' ? null : Number(capacity)
     if (capacityNum !== null && (Number.isNaN(capacityNum) || capacityNum < 0)) {
-      setError('Capacity must be a positive number.')
+      const message = 'Capacity must be a positive number.'
+      setError(message)
+      toast(message, 'error')
       return
     }
     onSave({

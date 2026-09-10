@@ -1,15 +1,19 @@
 import { useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { register } from '../auth/store.js'
 import FormField from '../components/FormField.jsx'
 import { toast } from '../toast.js'
 
 /** Registration form backed by the local auth store (auto sign-in on success). */
-export default function RegisterPage({ onSuccess, onNeedLogin }) {
+export default function RegisterPage() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [error, setError] = useState('')
+  const navigate = useNavigate()
+  const location = useLocation()
+  const from = location.state?.from ?? '/'
 
   const submit = (event) => {
     event.preventDefault()
@@ -20,7 +24,7 @@ export default function RegisterPage({ onSuccess, onNeedLogin }) {
       return
     }
     toast(`Welcome, ${result.user.name}! Your account is ready 🎉`, 'success')
-    onSuccess?.()
+    navigate(from, { replace: true })
   }
 
   return (
@@ -85,7 +89,7 @@ export default function RegisterPage({ onSuccess, onNeedLogin }) {
 
           <p className="mt-5 text-center text-xs text-slate-400">
             Already have an account?{' '}
-            <button type="button" onClick={onNeedLogin} className="font-bold text-emerald-300 hover:underline">
+            <button type="button" onClick={() => navigate('/login', { state: { from } })} className="font-bold text-emerald-300 hover:underline">
               Sign in
             </button>
           </p>
