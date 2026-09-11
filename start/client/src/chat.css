@@ -1,8 +1,11 @@
 /** Chatbot widget (dark theme, matches app). */
-/* @custom-variant dark(&:where(.dark, .dark *)) */
+
 @custom-variant dark {
-  &: where(.dark, .dark *);
+  &: where(.dark, .dark *) {
+    @slot; /* 👈 Tambahkan ini agar compiler tidak error */
+  }
 }
+/* @custom-variant dark (&:where(.dark, .dark *)); */
 
 .chat-open {
   --chat-open: 1;

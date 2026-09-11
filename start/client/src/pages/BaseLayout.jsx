@@ -1,3 +1,4 @@
+import ChatBotWidget from "../components/ChatBotWidget.jsx";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { toast } from "../toast.js";
@@ -23,6 +24,7 @@ export default function BaseLayout() {
 
           <Navbar />
           <Outlet />
+          <ChatBotWidget />
           <footer className="mt-12 border-t border-white/10 pb-8 text-center text-xs text-slate-500">
             Data: v3.football.api-sports.io · Teams · Squads · Player statistics
             · Dark mode

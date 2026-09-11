@@ -59,13 +59,6 @@ export const fetchTeam = (teamId) => async (dispatch) => {
       },
     );
 
-    // const result = await fetch(`https://v1.basketball.api-sports.io/players`, {
-    //   method: "GET",
-    //   headers: {
-    //     "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-    //   },
-    // });
-
     const data = await result.json();
     dispatch(fetchSuccess(data.response));
     console.log(data.response);
@@ -74,10 +67,9 @@ export const fetchTeam = (teamId) => async (dispatch) => {
   }
 };
 
-export const fetchPlayers = (teamId) => async (dispatch) => {
+export const fetchPlayers = () => async (dispatch) => {
   try {
     dispatch(fetchPending());
-    console.log("a");
 
     // const result = await fetch(
     //   `https://v3.football.api-sports.io/players/squads?team=${teamId}`,
@@ -104,6 +96,16 @@ export const fetchPlayers = (teamId) => async (dispatch) => {
   }
 };
 
-// Action creators are generated for each case reducer function
+export const fetchAI = (input) => async (dispatch) => {
+  try {
+    dispatch(fetchPending());
+
+    const result = await axios.get(`http://localhost:3002/`);
+
+    dispatch(fetchSuccess(result));
+  } catch (error) {
+    dispatch(fetchFailed(error.message || error));
+  }
+};
 
 export default todoSlice.reducer;
