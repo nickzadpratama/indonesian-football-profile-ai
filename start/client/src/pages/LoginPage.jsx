@@ -5,6 +5,7 @@ import FormField from "../components/FormField.jsx";
 import { toast } from "../toast.js";
 import Toastify from "toastify-js";
 import axios from "axios";
+import { GoogleLogin } from "@react-oauth/google";
 
 /** Sign-in form backed by the local auth store. Redirects back to where the user came from. */
 export default function LoginPage() {
@@ -18,7 +19,10 @@ export default function LoginPage() {
   async function handleLogin(e) {
     e.preventDefault();
     try {
-      const { data } = await axios.post(`/login`, { email, password });
+      const { data } = await axios.post(`https://football.nickz.online/login`, {
+        email,
+        password,
+      });
 
       localStorage.setItem("access_token", data.access_token);
       navigate("/");
@@ -37,7 +41,54 @@ export default function LoginPage() {
         onClick: function () {}, // Callback after click
       }).showToast();
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
+      Toastify({
+        text: "Failed login",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+          background: "#F87171",
+          color: "black",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    }
+  }
+
+  async function handleGoogleLogin(credentialResponse) {
+    try {
+      const { data } = await axios.post(
+        `/google-login`,
+        {},
+        {
+          headers: {
+            token: credentialResponse.credential,
+          },
+        },
+      );
+
+      localStorage.setItem("access_token", data.access_token);
+      navigate("/");
+      Toastify({
+        text: "Success login",
+        duration: 3000,
+        newWindow: true,
+        close: true,
+        gravity: "bottom", // `top` or `bottom`
+        position: "right", // `left`, `center` or `right`
+        stopOnFocus: true,
+        style: {
+          background: "#34D399",
+          color: "black",
+        },
+        onClick: function () {}, // Callback after click
+      }).showToast();
+    } catch (error) {
+      console.log(error.response);
       Toastify({
         text: "Failed login",
         duration: 3000,
@@ -71,20 +122,18 @@ export default function LoginPage() {
           </p>
 
           <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-4">
-            <FormField
+            <input
               id="login-email"
               label="Email"
               type="email"
-              value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
             />
-            <FormField
+            <input
               id="login-password"
               label="Password"
               type="password"
-              value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               autoComplete="current-password"
@@ -103,6 +152,7 @@ export default function LoginPage() {
             >
               Sign in →
             </button>
+            <GoogleLogin onSuccess={handleGoogleLogin} />
           </form>
 
           <p className="mt-5 text-center text-xs text-slate-400">

@@ -16,14 +16,18 @@ export default function RegisterPage() {
   const location = useLocation();
   const from = location.state?.from ?? "/";
 
+  console.log(username);
   async function handleRegister(e) {
     try {
       e.preventDefault();
-      const { data } = await axios.post(`/register`, {
-        username,
-        email,
-        password,
-      });
+      const { data } = await axios.post(
+        `https://football.nickz.online/register`,
+        {
+          username,
+          email,
+          password,
+        },
+      );
 
       console.log(data);
       navigate("/login");
@@ -42,7 +46,7 @@ export default function RegisterPage() {
         onClick: function () {}, // Callback after click
       }).showToast();
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
       Toastify({
         text: "Failed register",
         duration: 3000,
@@ -75,29 +79,26 @@ export default function RegisterPage() {
           </p>
 
           <form onSubmit={handleRegister} className="mt-6 flex flex-col gap-4">
-            <FormField
+            <input
               id="register-name"
               label="Username"
               type="text"
-              value={name}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Your name"
               autoComplete="name"
             />
-            <FormField
+            <input
               id="register-email"
               label="Email"
               type="email"
-              value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               autoComplete="email"
             />
-            <FormField
+            <input
               id="register-password"
               label="Password (min 6 chars)"
               type="password"
-              value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               autoComplete="new-password"

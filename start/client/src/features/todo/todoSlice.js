@@ -77,20 +77,25 @@ export const fetchTeam = (teamId) => async (dispatch) => {
 export const fetchPlayers = (teamId) => async (dispatch) => {
   try {
     dispatch(fetchPending());
+    console.log("a");
 
-    const result = await fetch(
-      `https://v3.football.api-sports.io/players/squads?team=${teamId}`,
-      {
-        method: "GET",
-        headers: {
-          "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-        },
+    // const result = await fetch(
+    //   `https://v3.football.api-sports.io/players/squads?team=${teamId}`,
+    //   {
+    //     method: "GET",
+    //     headers: {
+    //       "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
+    //     },
+    //   },
+    // );
+
+    const result = await fetch(`https://v1.basketball.api-sports.io/players`, {
+      method: "GET",
+      headers: {
+        "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
       },
-    );
+    });
 
-    // const data = await result.json();
-    // setPlayers(data.response);
-    // console.log(data.response);
     const data = await result.json();
     dispatch(fetchSuccess(data.response));
     console.log(data.response);

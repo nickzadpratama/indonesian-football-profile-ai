@@ -27,6 +27,7 @@ export default function PlayersPage() {
   // const [players, setPlayers] = useState([]);
 
   const { todos, loading, error } = useSelector((state) => state.todo);
+  console.log(todos);
   const players = todos.players;
   // console.log(todos);
   const info = todos.team ?? {};

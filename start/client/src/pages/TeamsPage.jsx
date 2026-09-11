@@ -19,6 +19,8 @@ export default function TeamsPage({ onSelect }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_STEP);
+  const { todos, loading, error } = useSelector((state) => state.todo);
+  // console.log(object);
   const [teamChoose, setTeamChoose] = useState({
     name: "",
     code: "",
@@ -31,35 +33,11 @@ export default function TeamsPage({ onSelect }) {
   });
   const dispatch = useDispatch();
   // const [teamName, setTeamName] = useState()
-  const { todos, loading, error } = useSelector((state) => state.todo);
-
-  // async function fetchTeams() {
-  //   try {
-  //     setLoading(true);
-  //     const result = await fetch(
-  //       "https://v3.football.api-sports.io/teams?country=indonesia",
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-  //         },
-  //       },
-  //     );
-
-  //     const data = await result.json();
-  //     setTeams(data.response);
-  //     console.log(data.response, teams);
-  //   } catch (error) {
-  //     console.error(error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // }
 
   async function handleJoin(e, infoId) {
     try {
       // e.preventDefault();
-      setLoading(true);
+      console.log(infoId);
       const result = await fetch(
         `https://v3.football.api-sports.io/teams?id=${infoId}`,
         {
@@ -108,17 +86,20 @@ export default function TeamsPage({ onSelect }) {
   async function postJoin(e, team) {
     try {
       e.preventDefault();
-      setTeamChoose({ name: team.team.name });
-      setTeamChoose({ code: team.team.code });
-      setTeamChoose({ logo: team.team.logo });
-      setTeamChoose({ founded: team.team.founded });
-      setTeamChoose({ stadium: team.team.stadium });
-      setTeamChoose({ city: team.team.city });
-      setTeamChoose({ capacity: team.team.capacity });
-      setTeamChoose({ image: team.team.image });
+      console.log("object");
+      console.log(team);
+      setTeamChoose({ name: todos.team.name });
+      setTeamChoose({ code: todos.team.code });
+      setTeamChoose({ logo: todos.team.logo });
+      setTeamChoose({ founded: todos.team.founded });
+      setTeamChoose({ stadium: todos.team.stadium });
+      setTeamChoose({ city: todos.team.city });
+      setTeamChoose({ capacity: todos.team.capacity });
+      setTeamChoose({ image: todos.team.image });
+      console.log(teamChoose);
 
       await axios.post(
-        `/`,
+        `https://football.nickz.online/`,
         { teamChoose },
         {
           headers: {
@@ -142,7 +123,7 @@ export default function TeamsPage({ onSelect }) {
         onClick: function () {}, // Callback after click
       }).showToast();
     } catch (error) {
-      console.log(error);
+      console.log(error.response);
       Toastify({
         text: "Data not found",
         duration: 3000,
@@ -296,7 +277,7 @@ export default function TeamsPage({ onSelect }) {
                     // key={team.team?.id}
                     key={team.id}
                     team={team}
-                    handleJoin={handleJoin}
+                    handleJoin={(e) => handleJoin(e, team.id)}
                     onClick={() => onSelect(team)}
                   />
                 ))}
