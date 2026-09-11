@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatBot Interaktif</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+    .app-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 24px;
+      text-align: center;
+    }
+    h1 {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    p.description {
+      color: #6b7280;
+      font-size: 18px;
+      margin-bottom: 64px;
+    }
+    .bot-toggle {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      border: none;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+    .bot-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.5);
+    }
+    .bot-popup {
+      position: fixed;
+      bottom: 100px;
+      right: 24px;
+      z-index: 9999;
+      width: 380px;
+      max-width: calc(100vw - 48px);
+      height: 520px;
+      max-height: calc(100vh - 120px);
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: botSlideUp 0.3s ease-out;
+    }
+    @keyframes botSlideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .bot-header {
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .bot-title { font-weight: 600; font-size: 16px; }
+    .bot-status { display: flex; align-items: center; gap: 6px; font-size: 12px; opacity: 0.9; margin-left: 12px; }
+    .bot-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .bot-actions { display: flex; gap: 8px; }
+    .bot-action-btn, .bot-close {
+      width: 32px; height: 32px; border: none;
+      background: rgba(255, 255, 255, 0.2); color: white;
+      border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bot-body {
+      flex: 1; padding: 16px; overflow-y: auto;
+      background: #f9fafb; display: flex; flex-direction: column;
+    }
+    .bot-messages {
+      flex: 1; overflow-y: auto; display: flex;
+      flex-direction: column; gap: 12px; padding-bottom: 8px;
+    }
+    .bot-message { display: flex; max-width: 85%; }
+    .bot-message.user { align-self: flex-end; }
+    .bot-message.bot { align-self: flex-start; }
+    .bot-bubble {
+      padding: 10px 14px; border-radius: 16px; position: relative;
+    }
+    .bot-message.user .bot-bubble {
+      background: #6366f1; color: white; border-bottom-right-radius: 4px;
+    }
+    .bot-message.bot .bot-bubble {
+      background: white; color: #1f2937; border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .bot-text { margin: 0; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
+    .bot-time {
+      position: absolute; top: 4px; right: 8px;
+      font-size: 10px; opacity: 0.6;
+    }
+    .bot-message.user .bot-time { color: rgba(255, 255, 255, 0.8); }
+    .typing-dots {
+      display: flex; gap: 4px; padding: 8px 12px;
+      background: white; border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    .typing-dots span {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #94a3b8; animation: typing 1.4s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes typing {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+      30% { transform: translateY(-4px); opacity: 1; }
+    }
+    .bot-footer {
+      padding: 12px 16px; background: white;
+      border-top: 1px solid #e5e7eb; display: flex; gap: 8px;
+    }
+    .bot-input {
+      flex: 1; padding: 10px 14px; border: 1px solid #e5e7eb;
+      border-radius: 20px; font-size: 14px; outline: none;
+    }
+    .bot-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+    .bot-send {
+      width: 40px; height: 40px; border: none;
+      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      color: white; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .bot-send:hover:not(:disabled) { transform: scale(1.05); }
+    .bot-send:disabled { background: #d1d5db; cursor: not-allowed; }
+    @media (max-width: 480px) {
+      .bot-popup { right: 8px; left: 8px; bottom: 88px; width: auto; height: 70vh; }
+      .bot-toggle { bottom: 16px; right: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useRef, useEffect, useCallback } = React;
+
+    function ChatBot() {
+      const [isOpen, setIsOpen] = useState(false);
+      const [messages, setMessages] = useState([
+        { id: Date.now(), text: "Halo! Saya assistant virtual. Ada yang bisa saya bantu?", sender: "bot", timestamp: new Date() }
+      ]);
+      const [inputValue, setInputValue] = useState("");
+      const [isProcessing, setIsProcessing] = useState(false);
+      const messagesEndRef = useRef(null);
+
+      const scrollToBottom = useCallback(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, []);
+
+      useEffect(() => { scrollToBottom(); }, [messages, scrollToBottom]);
+
+      const getBotReply = (msg) => {
+        const lower = msg.toLowerCase().trim();
+        if (lower.includes("halo") || lower.includes("hi") || lower.includes("hey"))
+          return "Hai! Selamat datang! Apa yang bisa saya bantu hari ini?";
+        if (lower.includes("nama") || lower.includes("siapa"))
+          return "Saya assistant virtual yang siap membantu Anda!";
+        if (lower.includes("bantu") || lower.includes("tolong"))
+          return "Tentu! Silakan jelaskan apa yang ingin Anda tanya.";
+        if (lower.includes("terima kasih"))
+          return "Sama-sama! Senang bisa membantu Anda. 😊";
+        if (lower.includes("jam"))
+          return `Sekarang jam ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}.`;
+        if (lower.includes("tanggal"))
+          return `Hari ini tanggal ${new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}.`;
+        const fallbacks = [
+          "Menarik! Bisa dijelaskan lebih detail?",
+          "Baik, saya catat. Ada lagi yang bisa saya bantu?",
+          "Saya mengerti. Mohon maaf jika saya tidak bisa menjawab secara spesifik.",
+          "Terima kasih atas pertanyaannya! Ada hal lain?",
+          "Baiklah, silakan lanjutkan...",
+        ];
+        return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+      };
+
+      const handleSend = useCallback(async () => {
+        const trimmed = inputValue.trim();
+        if (!trimmed || isProcessing) return;
+        const userMsg = { id: Date.now(), text: trimmed, sender: "user", timestamp: new Date() };
+        setMessages(p => [...p, userMsg]);
+        setInputValue("");
+        setIsProcessing(true);
+        await new Promise(r => setTimeout(r, 600 + Math.random() * 700));
+        const reply = getBotReply(trimmed);
+        setMessages(p => [...p, { id: Date.now(), text: reply, sender: "bot", timestamp: new Date() }]);
+        setIsProcessing(false);
+      }, [inputValue, isProcessing]);
+
+      const handleKeyDown = (e) => {
+        if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); }
+      };
+
+      const formatTime = (d) => d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+      return (
+        <>
+          <button className="bot-toggle" onClick={() => setIsOpen(v => !v)}>
+            {isOpen ? (
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            ) : (
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            )}
+          </button>
+          {isOpen && (
+            <div className="bot-popup" role="dialog">
+              <div className="bot-header">
+                <div>
+                  <span className="bot-title">Assistant</span>
+                  <span className="bot-status"><span className="bot-dot" />Online</span>
+                </div>
+                <div className="bot-actions">
+                  <button className="bot-action-btn" onClick={() => setMessages([{ id: Date.now(), text: "Halo! Saya assistant virtual. Ada yang bisa saya bantu?", sender: "bot", timestamp: new Date() }])} title="Reset">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                  </button>
+                  <button className="bot-close" onClick={() => setIsOpen(false)}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div className="bot-body">
+                <div className="bot-messages">
+                  {messages.map(m => (
+                    <div key={m.id} className={"bot-message " + (m.sender === "user" ? "user" : "bot")}>
+                      <div className="bot-bubble">
+                        <p className="bot-text">{m.text}</p>
+                        <span className="bot-time">{formatTime(m.timestamp)}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {isProcessing && (
+                    <div className="bot-message bot typing-indicator">
+                      <div className="bot-bubble"><div className="typing-dots"><span /><span /><span /></div></div>
+                    </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
+              </div>
+              <div className="bot-footer">
+                <input type="text" className="bot-input" placeholder="Ketik pesan..." value={inputValue} onChange={e => setInputValue(e.target.value)} onKeyDown={handleKeyDown} disabled={isProcessing} maxLength={500} />
+                <button className="bot-send" onClick={handleSend} disabled={!inputValue.trim() || isProcessing}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 2 11 13"/><path d="M22 2 15 22 8 10 11 2Z"/></svg>
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      );
+    }
+
+    function App() {
+      return (
+        <div className="app-container">
+          <h1>ChatBot Interaktif</h1>
+          <p className="description">Klik tombol di pojok kanan bawah untuk membuka chatbot</p>
+          <ChatBot />
+        </div>
+      );
+    }
+
+    const root = ReactDOM.createRoot(document.getElementById("root"));
+    root.render(<App />);
+  </script>
+</body>
+</html>

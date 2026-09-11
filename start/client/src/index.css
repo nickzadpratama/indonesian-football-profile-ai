@@ -1,0 +1,116 @@
+@import "tailwindcss";
+
+/* Class-based dark mode variant (Tailwind CSS v4) */
+@custom-variant dark {
+  &: where(.dark, .dark *) {
+    @slot; /* 👈 Tambahkan ini agar compiler tidak error */
+  }
+}
+/* @custom-variant dark (&:where(.dark, .dark *)); */
+
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #07070c;
+  }
+}
+
+/* Custom animations: card vote pop */
+@keyframes vote-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.35);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.vote-pop {
+  animation: vote-pop 0.35s ease-in-out;
+}
+
+/* ── Toastify — dark theme (matches app) ─────────────── */
+.toastify {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  max-width: min(420px, calc(100vw - 40px));
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  background: #0f172b;
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: default;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
+
+.football-toast-body {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.football-toast-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.football-toast-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.football-toast-success {
+  border-color: rgba(52, 211, 153, 0.35);
+}
+.football-toast-success .football-toast-icon {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+}
+
+.football-toast-error {
+  border-color: rgba(251, 113, 133, 0.35);
+}
+.football-toast-error .football-toast-icon {
+  background: rgba(244, 63, 94, 0.18);
+  color: #fb7185;
+}
+
+.football-toast-neutral .football-toast-icon {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.toast-close {
+  flex-shrink: 0;
+  color: #94a3b8;
+  opacity: 0.6;
+  font-family: inherit;
+  padding: 0 4px;
+  transition: opacity 0.2s;
+}
+.toast-close:hover {
+  opacity: 1;
+  color: #ffffff;
+}
+@import "./chat.css";
