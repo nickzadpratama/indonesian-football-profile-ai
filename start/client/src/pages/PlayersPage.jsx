@@ -13,7 +13,7 @@ import { useSelector, useDispatch } from "react-redux";
 //   setErrorProduct,
 //   fetchData,
 // } from "../features/product/productSlice";
-import { fetchPlayers, fetchTeam } from "../features/todo/todoSlice.js";
+import { fetchPlayers } from "../features/player/playerSlice.js";
 import { useParams } from "react-router-dom";
 
 // export default function PlayersPage({

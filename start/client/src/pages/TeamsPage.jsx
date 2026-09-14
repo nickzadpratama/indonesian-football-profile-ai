@@ -5,9 +5,10 @@ import { Loader, ErrorPanel } from "../components/Status.jsx";
 import gifLoading from "../components/assets/vecteezy_loading-bar-progress-with-green-color-vector-illustration_14945926.svg";
 import Toastify from "toastify-js";
 import axios from "axios";
-import { fetchTeams } from "../features/todo/todoSlice.js";
+import { fetchTeams } from "../features/team/teamSlice.js";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
+import { toastifyError } from "../utils/toastify.js";
 
 const PAGE_STEP = 18;
 
@@ -19,7 +20,7 @@ export default function TeamsPage({ onSelect }) {
   const [reloadKey, setReloadKey] = useState(0);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_STEP);
-  const { todos, loading, error } = useSelector((state) => state.todo);
+  const { data, loading, error } = useSelector((state) => state.team);
   // console.log(object);
   const [teamChoose, setTeamChoose] = useState({
     name: "",
@@ -35,8 +36,8 @@ export default function TeamsPage({ onSelect }) {
   // const [teamName, setTeamName] = useState()
 
   async function handleJoin(e, infoId) {
+    e.preventDefault();
     try {
-      // e.preventDefault();
       console.log(infoId);
       const result = await fetch(
         `https://v3.football.api-sports.io/teams?id=${infoId}`,
@@ -65,21 +66,8 @@ export default function TeamsPage({ onSelect }) {
         onClick: function () {}, // Callback after click
       }).showToast();
     } catch (error) {
-      console.log(error);
-      Toastify({
-        text: "Data not found",
-        duration: 3000,
-        newWindow: true,
-        close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
-        stopOnFocus: true,
-        style: {
-          background: "#F87171",
-          color: "black",
-        },
-        onClick: function () {}, // Callback after click
-      }).showToast();
+      console.log(error?.response?.data);
+      toastifyError(error?.response?.data);
     }
   }
 
@@ -88,14 +76,14 @@ export default function TeamsPage({ onSelect }) {
       e.preventDefault();
       console.log("object");
       console.log(team);
-      setTeamChoose({ name: todos.team.name });
-      setTeamChoose({ code: todos.team.code });
-      setTeamChoose({ logo: todos.team.logo });
-      setTeamChoose({ founded: todos.team.founded });
-      setTeamChoose({ stadium: todos.team.stadium });
-      setTeamChoose({ city: todos.team.city });
-      setTeamChoose({ capacity: todos.team.capacity });
-      setTeamChoose({ image: todos.team.image });
+      setTeamChoose({ name: data.team.name });
+      setTeamChoose({ code: data.team.code });
+      setTeamChoose({ logo: data.team.logo });
+      setTeamChoose({ founded: data.team.founded });
+      setTeamChoose({ stadium: data.team.stadium });
+      setTeamChoose({ city: data.team.city });
+      setTeamChoose({ capacity: data.team.capacity });
+      setTeamChoose({ image: data.team.image });
       console.log(teamChoose);
 
       await axios.post(
@@ -171,7 +159,7 @@ export default function TeamsPage({ onSelect }) {
   // };
 
   const term = query.trim().toLowerCase();
-  const filtered = (todos ?? []).filter((t) => {
+  const filtered = (data ?? []).filter((t) => {
     if (!term) return true;
     const teamName = t.team?.name?.toLowerCase() || "";
     return teamName.includes(term);

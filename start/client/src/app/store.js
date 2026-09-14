@@ -1,11 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
-// import authReducer from "./authSlice.js";
-import todoReducer from "../features/todo/todoSlice.js";
+import { teamReducer } from "../features/team/teamSlice.js";
+import { playerReducer } from "../features/player/playerSlice.js";
+import { geminiReducer } from "../features/gemini/gemini.js";
 
-export const store = configureStore({
+export default configureStore({
   reducer: {
-    todo: todoReducer,
+    team: teamReducer,
+    player: playerReducer,
+    gemini: geminiReducer,
   },
 });
-
-export default store;

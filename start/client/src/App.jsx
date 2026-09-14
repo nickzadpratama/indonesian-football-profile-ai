@@ -15,7 +15,7 @@ import PlayerProfilePage from "./pages/PlayerProfilePage.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 
-import BaseLayout from "./pages/BaseLayout.jsx";
+import BaseLayout from "./layouts/BaseLayout.jsx";
 
 const seasonFromParam = (raw) => {
   const year = Number(raw);

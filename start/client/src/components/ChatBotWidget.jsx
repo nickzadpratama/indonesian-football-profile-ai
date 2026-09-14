@@ -1,11 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./ChatBotWidget.css";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAI } from "../features/todo/todoSlice";
 
 export default function ChatBotWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const { todos, loading, error } = useSelector((state) => state.todo);
+  const { data, loading, error } = useSelector((state) => state.gemini);
   const [messages, setMessages] = useState([
     {
       id: Date.now(),
