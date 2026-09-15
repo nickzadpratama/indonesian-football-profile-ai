@@ -8,6 +8,8 @@ import {
   toggleVote,
 } from "../data/votes.js";
 import { Link } from "react-router-dom";
+import axios from "axios";
+import { toastifyError } from "../utils/toastify.js";
 
 /**
  * Team card for the teams list. The cover + details navigate to the squad;
@@ -25,6 +27,15 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
 
   const voteCount = baseVoteCount(teamId) + (voted ? 1 : 0);
 
+  const name = info.name;
+  const code = info.code;
+  const logo = info.logo;
+  const founded = info.founded;
+  const stadium = info.stadium;
+  const city = info.city;
+  const capacity = info.capacity;
+  const image = info.image;
+
   const handleVote = () => {
     const nowVoted = toggleVote(teamId);
     setPopTick((tick) => tick + 1);
@@ -33,6 +44,27 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
       nowVoted ? "success" : "neutral",
     );
   };
+
+  async function postJoin(e) {
+    try {
+      e.preventDefault();
+      console.log("object");
+
+      await axios.post(
+        // `https://football.nickz.online/`,
+        "http://localhost:3000/",
+        { name, code, logo, founded, stadium, city, capacity, image },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.access_token}`,
+          },
+        },
+      );
+    } catch (error) {
+      console.log(error.response.data);
+      toastifyError(error.response.data.message);
+    }
+  }
 
   return (
     <article
@@ -122,7 +154,7 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
       {/* ── Footer: navigate + vote ───────────────── */}
       <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-black/10 px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
-          <Link to={`/${info.id}`}>
+          <Link to={`/team/${info.id}`}>
             <div
               type="button"
               className="flex items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 text-[11px] font-bold text-slate-200 ring-1 ring-white/10 transition hover:bg-white/15 hover:text-emerald-300"
@@ -150,7 +182,7 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
 
         <button
           type="button"
-          onClick={(e) => handleJoin(e, info.id)}
+          onClick={postJoin}
           aria-pressed={voted}
           aria-label={`${voted ? "Unvote" : "Vote"} for ${info.name}`}
           title={`${voted ? "Remove your vote from" : "Vote for"} ${info.name}`}

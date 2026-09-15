@@ -1,9 +1,12 @@
 import ChatBotWidget from "../components/ChatBotWidget.jsx";
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 
 /** Sign-in form backed by the local auth store. Redirects back to where the user came from. */
 export default function BaseLayout() {
+  if (!localStorage.access_token) {
+    return <Navigate to="/login" />;
+  }
   return (
     <>
       <div className="dark min-h-screen bg-[#07070c] text-slate-100">

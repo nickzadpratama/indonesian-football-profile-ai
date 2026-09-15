@@ -14,13 +14,14 @@ const DEFAULT_POSITION =
  * Player card for the squad list. Middle-size photo (96 px) with an
  * initials fallback. Clicking opens the player profile & statistics page.
  */
-export default function PlayerCard({ player, onClick }) {
+export default function PlayerCard({ el }) {
+  const player = el.players ?? {};
   const positionClass = positionStyles[player.position] ?? DEFAULT_POSITION;
 
   return (
     <button
       type="button"
-      onClick={onClick}
+      // onClick={onClick}
       className="group flex w-full flex-col overflow-hidden rounded-2xl bg-slate-900/80 text-left ring-1 ring-white/10 shadow-lg shadow-slate-950/40 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-900/50 hover:ring-emerald-400/30"
     >
       {/* ── Photo (middle size) ───────────────────── */}
