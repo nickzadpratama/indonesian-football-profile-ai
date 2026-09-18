@@ -1,37 +1,18 @@
 import { useEffect, useState } from "react";
 import Avatar from "./Avatar.jsx";
-import { toast } from "../toast.js";
-import {
-  baseVoteCount,
-  hasVoted,
-  onVotesChange,
-  toggleVote,
-} from "../data/votes.js";
+import { hasVoted, onVotesChange } from "../data/votes.js";
 import { Link } from "react-router-dom";
 
 /**
  * Team card for the My Teams page. Displays a team saved on the server
  * (flat shape: name/code/founded/stadium/city/capacity/image directly on
- * team). The vote button toggles a ★-style upvote with a visible effect
- * when voted.
+ * team), with quick links to the squad page and the update form.
  */
 export default function MyTeamCard({ team, onUpdate }) {
   const teamId = team.id;
   const [voted, setVoted] = useState();
-  const [popTick, setPopTick] = useState(0);
 
   useEffect(() => onVotesChange(() => setVoted(hasVoted(teamId))), [teamId]);
-
-  const voteCount = baseVoteCount(teamId) + (voted ? 1 : 0);
-
-  const handleVote = () => {
-    const nowVoted = toggleVote(teamId);
-    setPopTick((tick) => tick + 1);
-    toast(
-      nowVoted ? `▲ Voted for ${team.name}` : `Vote removed — ${team.name}`,
-      nowVoted ? "success" : "neutral",
-    );
-  };
 
   return (
     <article
@@ -120,7 +101,7 @@ export default function MyTeamCard({ team, onUpdate }) {
         </div>
       </button>
 
-      {/* ── Footer: navigate + vote ───────────────── */}
+      {/* ── Footer: navigate + update ─────────────── */}
       <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-black/10 px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
           <Link to={`/team/${team.id}`}>
@@ -148,31 +129,6 @@ export default function MyTeamCard({ team, onUpdate }) {
             </button>
           )}
         </div>
-
-        <button
-          type="button"
-          onClick={handleVote}
-          aria-pressed={voted}
-          aria-label={`${voted ? "Unvote" : "Vote"} for ${team.name}`}
-          title={`${voted ? "Remove your vote from" : "Vote for"} ${team.name}`}
-          className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition ${
-            voted
-              ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/40"
-              : "bg-white/10 text-slate-300 ring-1 ring-white/20 hover:bg-emerald-500/15 hover:text-emerald-300"
-          }`}
-        >
-          <span
-            key={popTick}
-            aria-hidden="true"
-            className={`text-sm ${voted && popTick ? "vote-pop" : ""}`}
-          >
-            ▲
-          </span>
-          <span className="tabular-nums">
-            {voteCount.toLocaleString("en-US")}
-          </span>
-          <span>{voted ? "Voted ✓" : "Vote"}</span>
-        </button>
       </footer>
     </article>
   );

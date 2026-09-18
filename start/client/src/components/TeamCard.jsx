@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
 import Avatar from "./Avatar.jsx";
 import { toast } from "../toast.js";
-import {
-  baseVoteCount,
-  hasVoted,
-  onVotesChange,
-  toggleVote,
-} from "../data/votes.js";
+import { hasVoted, onVotesChange, toggleVote } from "../data/votes.js";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toastifyError } from "../utils/toastify.js";
 
 /**
  * Team card for the teams list. The cover + details navigate to the squad;
- * the vote button toggles a ★-style upvote with a visible effect when voted.
+ * the "Join Fanbase" button registers the club as the user's fanbase and
+ * marks the card as joined (✓ My Teams badge) once it succeeds.
  */
 export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
   const info = team.team ?? {};
@@ -21,25 +17,13 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
   const teamId = info.id;
 
   const [voted, setVoted] = useState();
-  const [popTick, setPopTick] = useState(0);
 
   useEffect(() => onVotesChange(() => setVoted(hasVoted(teamId))), [teamId]);
-
-  const voteCount = baseVoteCount(teamId) + (voted ? 1 : 0);
 
   const name = info.name;
   const code = info.code;
   const logo = info.logo;
   const founded = info.founded;
-
-  const handleVote = () => {
-    const nowVoted = toggleVote(teamId);
-    setPopTick((tick) => tick + 1);
-    toast(
-      nowVoted ? `▲ Voted for ${info.name}` : `Vote removed — ${info.name}`,
-      nowVoted ? "success" : "neutral",
-    );
-  };
 
   async function postJoin(e) {
     try {
@@ -65,7 +49,8 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
         },
       );
 
-      toast(`${info.name} joined to your teams`, "success");
+      if (!voted) toggleVote(teamId);
+      toast(`Joined ${info.name} fanbase`, "success");
     } catch (error) {
       console.log(error?.response?.data);
       toastifyError(error?.response?.data?.message ?? error?.message);
@@ -157,7 +142,7 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
         </div>
       </button>
 
-      {/* ── Footer: navigate + vote ───────────────── */}
+      {/* ── Footer: navigate + join fanbase ───────── */}
       <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-black/10 px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
           <Link to={`/team/${info.id}`}>
@@ -190,25 +175,18 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
           type="button"
           onClick={postJoin}
           aria-pressed={voted}
-          aria-label={`${voted ? "Unvote" : "Vote"} for ${info.name}`}
-          title={`${voted ? "Remove your vote from" : "Vote for"} ${info.name}`}
+          aria-label={`${voted ? "Joined" : "Join"} ${info.name} fanbase`}
+          title={`${voted ? "You have joined" : "Join"} ${info.name} fanbase`}
           className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition ${
             voted
               ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/40"
               : "bg-white/10 text-slate-300 ring-1 ring-white/20 hover:bg-emerald-500/15 hover:text-emerald-300"
           }`}
         >
-          <span
-            key={popTick}
-            aria-hidden="true"
-            className={`text-sm ${voted && popTick ? "vote-pop" : ""}`}
-          >
-            ▲
+          <span aria-hidden="true" className="text-sm">
+            ★
           </span>
-          <span className="tabular-nums">
-            {voteCount.toLocaleString("en-US")}
-          </span>
-          <span>{voted ? "Voted ✓" : "Vote"}</span>
+          <span>{voted ? "Joined ✓" : "Join Fanbase"}</span>
         </button>
       </footer>
     </article>
