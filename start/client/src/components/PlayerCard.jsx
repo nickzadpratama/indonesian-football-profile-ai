@@ -1,4 +1,5 @@
 import Avatar from "./Avatar.jsx";
+import { Link } from "react-router-dom";
 
 const positionStyles = {
   Goalkeeper: "bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/30",
@@ -12,16 +13,21 @@ const DEFAULT_POSITION =
 
 /**
  * Player card for the squad list. Middle-size photo (96 px) with an
- * initials fallback. Clicking opens the player profile & statistics page.
+ * initials fallback. Clicking anywhere on the card opens the player profile
+ * & statistics page (/players/:playerId). The player object rides along in
+ * location.state so the profile header shows instantly while the statistics
+ * are still being fetched (ProfileRoute reads it as location.state.player).
  */
 export default function PlayerCard({ el }) {
   const player = el.players ?? {};
   const positionClass = positionStyles[player.position] ?? DEFAULT_POSITION;
+  const profilePath = player.id ? `/players/${player.id}` : "/";
 
   return (
-    <button
-      type="button"
-      // onClick={onClick}
+    <Link
+      to={profilePath}
+      state={{ player }}
+      title={`Open ${player.name ?? "player"} profile & stats`}
       className="group flex w-full flex-col overflow-hidden rounded-2xl bg-slate-900/80 text-left ring-1 ring-white/10 shadow-lg shadow-slate-950/40 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-900/50 hover:ring-emerald-400/30"
     >
       {/* ── Photo (middle size) ───────────────────── */}
@@ -64,6 +70,6 @@ export default function PlayerCard({ el }) {
           →
         </span>
       </div>
-    </button>
+    </Link>
   );
 }

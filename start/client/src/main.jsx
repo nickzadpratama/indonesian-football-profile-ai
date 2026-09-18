@@ -7,9 +7,17 @@ import store from "./app/store";
 import { Provider } from "react-redux";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
+/* Client ID Google OAuth — bisa dioverride lewat .env client:
+   VITE_GOOGLE_CLIENT_ID=xxxxx.apps.googleusercontent.com
+   (harus sama dengan GOOGLE_CLIENT_ID di server/.env agar
+   verifikasi token di server lolos). */
+const GOOGLE_CLIENT_ID =
+  import.meta.env.VITE_GOOGLE_CLIENT_ID ||
+  "778334040842-f1npb34334aearksr30upc1prhv6scbd.apps.googleusercontent.com";
+
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <GoogleOAuthProvider clientId="778334040842-f1npb34334aearksr30upc1prhv6scbd.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
       <Provider store={store}>
         <App />
       </Provider>

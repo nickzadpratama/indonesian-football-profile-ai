@@ -24,26 +24,17 @@ export const playerSlice = createSlice({
 
 export const { fetchPending, fetchSuccess, fetchFailed } = playerSlice.actions;
 
-export const fetchPlayers = () => async (dispatch) => {
+export const fetchPlayerStatistic = (playerId, season) => async (dispatch) => {
   try {
     dispatch(fetchPending());
 
     const result = await fetch(
-      `https://v3.football.api-sports.io/players/squads?player=${playerId}`,
+      `https://v3.football.api-sports.io/players?id=${playerId}&season=${season}`,
       {
         method: "GET",
-        headers: {
-          "x-apisports-key": "e194d63f6878ad3c12abc5d1a31cb315", // <-- Ganti dengan API key Anda
-        },
+        headers: { "x-apisports-key": "e194d63f6878ad3c12abc5d1a31cb315" },
       },
     );
-
-    // const result = await fetch(`https://v1.basketball.api-sports.io/players`, {
-    //   method: "GET",
-    //   headers: {
-    //     "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-    //   },
-    // });
 
     const data = await result.json();
     dispatch(fetchSuccess(data.response));

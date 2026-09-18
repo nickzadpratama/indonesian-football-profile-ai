@@ -31,10 +31,6 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
   const code = info.code;
   const logo = info.logo;
   const founded = info.founded;
-  const stadium = info.stadium;
-  const city = info.city;
-  const capacity = info.capacity;
-  const image = info.image;
 
   const handleVote = () => {
     const nowVoted = toggleVote(teamId);
@@ -48,21 +44,31 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
   async function postJoin(e) {
     try {
       e.preventDefault();
-      console.log("object");
 
       await axios.post(
         // `https://football.nickz.online/`,
         "http://localhost:3000/",
-        { name, code, logo, founded, stadium, city, capacity, image },
+        {
+          name,
+          code,
+          logo,
+          founded,
+          stadium: venue.name,
+          city: venue.city,
+          capacity: venue.capacity,
+          image: venue.image,
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.access_token}`,
           },
         },
       );
+
+      toast(`${info.name} joined to your teams`, "success");
     } catch (error) {
-      console.log(error.response.data);
-      toastifyError(error.response.data.message);
+      console.log(error?.response?.data);
+      toastifyError(error?.response?.data?.message ?? error?.message);
     }
   }
 

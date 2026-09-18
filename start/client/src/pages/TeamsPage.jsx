@@ -13,12 +13,10 @@ import { Link } from "react-router-dom";
 
 const PAGE_STEP = 18;
 
-export default function TeamsPage({ onSelect }) {
+export default function TeamsPage() {
   // const [teams, setTeams] = useState([]);
   // const [loading, setLoading] = useState(false);
   // const [error, setError] = useState(null);
-  const [phase, setPhase] = useState("loading"); // 'loading' | 'ok' | 'error'
-  const [reloadKey, setReloadKey] = useState(0);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_STEP);
   const { data, loading, error } = useSelector((state) => state.team);
@@ -200,7 +198,6 @@ export default function TeamsPage({ onSelect }) {
                   // key={team.team?.id}
                   key={team.id}
                   team={team}
-                  handleJoin={(e) => handleJoin(e, team.id)}
                   // onClick={() => onSelect(team)}
                 />
               ))}

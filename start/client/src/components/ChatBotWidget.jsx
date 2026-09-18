@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./ChatBotWidget.css";
 import { useDispatch, useSelector } from "react-redux";
+import { fetchAI } from "../features/gemini/geminiSlice";
 
 export default function ChatBotWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const { data, loading, error } = useSelector((state) => state.gemini);
+  const { loading } = useSelector((state) => state.gemini);
   const [messages, setMessages] = useState([
     {
       id: Date.now(),
@@ -14,7 +15,7 @@ export default function ChatBotWidget() {
     },
   ]);
   const [inputValue, setInputValue] = useState("");
-  const [isProcessing, setIsProcessing] = useState(false);
+  const isProcessing = loading;
   const messagesEndRef = useRef(null);
   const dispatch = useDispatch();
 
@@ -22,9 +23,32 @@ export default function ChatBotWidget() {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, []);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(fetchAI(inputValue));
+    if (!inputValue.trim() || isProcessing) return;
+    const userText = inputValue;
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        text: userText,
+        sender: "user",
+        timestamp: new Date(),
+      },
+    ]);
+    setInputValue("");
+
+    const reply = await dispatch(fetchAI(userText));
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now(),
+        text: typeof reply === "string" ? reply : getBotReply(userText),
+        sender: "bot",
+        timestamp: new Date(),
+      },
+    ]);
   };
 
   useEffect(() => {
@@ -192,13 +216,14 @@ export default function ChatBotWidget() {
                 type="text"
                 className="bot-input text-black"
                 placeholder="Ketik pesan..."
+                value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 // onKeyDown={handleKeyDown}
                 disabled={isProcessing}
                 maxLength={500}
               />
               <button
-                type="button"
+                type="submit"
                 className="bot-send"
                 // onClick={handleSend}
                 disabled={!inputValue.trim() || isProcessing}

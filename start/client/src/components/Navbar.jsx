@@ -68,7 +68,7 @@ export default function Navbar() {
             Teams
           </NavLink>
           <NavLink
-            to="/my-teams"
+            to="/myTeam"
             className={({ isActive }) => navClass(isActive)}
           >
             My Teams
