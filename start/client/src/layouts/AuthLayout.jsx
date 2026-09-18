@@ -1,12 +1,20 @@
 import ChatBotWidget from "../components/ChatBotWidget.jsx";
 import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
+import { isTokenValid, purgeInvalidToken } from "../auth/session.js";
 
-/** Sign-in form backed by the local auth store. Redirects back to where the user came from. */
+/**
+ * Layout untuk halaman /login & /register. Kalau token yang tersimpan
+ * masih valid, user diarahkan ke beranda; token yang sudah kedaluwarsa
+ * dibuang supaya halaman login tidak "terkunci" redirect ke /.
+ */
 export default function AuthLayout() {
-  if (localStorage.access_token) {
+  if (isTokenValid()) {
     return <Navigate to="/" />;
   }
+
+  // Token rusak/kedaluwarsa tidak boleh menahan user di luar halaman login.
+  purgeInvalidToken();
   return (
     <>
       <div className="dark min-h-screen bg-[#07070c] text-slate-100">

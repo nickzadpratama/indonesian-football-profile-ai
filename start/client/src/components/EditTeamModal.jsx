@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import FormField from './FormField.jsx'
-import { toast } from '../toast.js'
+import { useEffect, useState } from "react";
+import FormField from "./FormField.jsx";
+import { toast } from "../toast.js";
 
 /**
  * Modal dialog to update one team's value fields. The team entry is
@@ -8,47 +8,57 @@ import { toast } from '../toast.js'
  * city, stadium, capacity }. Closes via backdrop click or Escape.
  */
 export default function EditTeamModal({ team, onSave, onClose }) {
-  const info = team.team ?? {}
-  const venue = team.venue ?? {}
+  const info = team.team ?? {};
+  const venue = team.venue ?? {};
 
-  const [name, setName] = useState(info.name ?? '')
-  const [code, setCode] = useState(info.code ?? '')
-  const [founded, setFounded] = useState(info.founded ? String(info.founded) : '')
-  const [city, setCity] = useState(venue.city ?? '')
-  const [stadium, setStadium] = useState(venue.name ?? '')
-  const [capacity, setCapacity] = useState(venue.capacity ? String(venue.capacity) : '')
-  const [error, setError] = useState('')
+  const [name, setName] = useState(info.name ?? "");
+  const [code, setCode] = useState(info.code ?? "");
+  const [founded, setFounded] = useState(
+    info.founded ? String(info.founded) : "",
+  );
+  const [city, setCity] = useState(venue.city ?? "");
+  const [stadium, setStadium] = useState(venue.name ?? "");
+  const [capacity, setCapacity] = useState(
+    venue.capacity ? String(venue.capacity) : "",
+  );
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const onKey = (event) => {
-      if (event.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [onClose])
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   const submit = (event) => {
-    event.preventDefault()
-    const cleanedName = name.trim()
+    event.preventDefault();
+    const cleanedName = name.trim();
     if (cleanedName.length < 2) {
-      const message = 'Team name must be at least 2 characters.'
-      setError(message)
-      toast(message, 'error')
-      return
+      const message = "Team name must be at least 2 characters.";
+      setError(message);
+      toast(message, "error");
+      return;
     }
-    const foundedNum = founded.trim() === '' ? null : Number(founded)
-    if (foundedNum !== null && (Number.isNaN(foundedNum) || foundedNum < 1800 || foundedNum > 2100)) {
-      const message = 'Founded year looks invalid (1800–2100).'
-      setError(message)
-      toast(message, 'error')
-      return
+    const foundedNum = founded.trim() === "" ? null : Number(founded);
+    if (
+      foundedNum !== null &&
+      (Number.isNaN(foundedNum) || foundedNum < 1800 || foundedNum > 2100)
+    ) {
+      const message = "Founded year looks invalid (1800–2100).";
+      setError(message);
+      toast(message, "error");
+      return;
     }
-    const capacityNum = capacity.trim() === '' ? null : Number(capacity)
-    if (capacityNum !== null && (Number.isNaN(capacityNum) || capacityNum < 0)) {
-      const message = 'Capacity must be a positive number.'
-      setError(message)
-      toast(message, 'error')
-      return
+    const capacityNum = capacity.trim() === "" ? null : Number(capacity);
+    if (
+      capacityNum !== null &&
+      (Number.isNaN(capacityNum) || capacityNum < 0)
+    ) {
+      const message = "Capacity must be a positive number.";
+      setError(message);
+      toast(message, "error");
+      return;
     }
     onSave({
       name: cleanedName,
@@ -57,8 +67,8 @@ export default function EditTeamModal({ team, onSave, onClose }) {
       city: city.trim(),
       stadium: stadium.trim(),
       capacity: capacityNum,
-    })
-  }
+    });
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -82,8 +92,12 @@ export default function EditTeamModal({ team, onSave, onClose }) {
               ✎
             </span>
             <div className="min-w-0">
-              <h2 className="truncate text-sm font-black tracking-tight text-white">Update {info.name}</h2>
-              <p className="text-[11px] text-slate-400">Edit team value details</p>
+              <h2 className="truncate text-sm font-black tracking-tight text-white">
+                Update {info.name}
+              </h2>
+              <p className="text-[11px] text-slate-400">
+                Edit team value details
+              </p>
             </div>
           </div>
           <button
@@ -149,7 +163,10 @@ export default function EditTeamModal({ team, onSave, onClose }) {
           />
 
           {error && (
-            <p role="alert" className="rounded-lg bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30">
+            <p
+              role="alert"
+              className="rounded-lg bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30"
+            >
               {error}
             </p>
           )}
@@ -172,5 +189,5 @@ export default function EditTeamModal({ team, onSave, onClose }) {
         </form>
       </div>
     </div>
-  )
+  );
 }

@@ -32,7 +32,7 @@ export default function UpdatePage() {
     let cancelled = false;
 
     axios
-      .get(`http://localhost:3000/${teamId}`, {
+      .get(`http://football.nickz.online/${teamId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.access_token}`,
         },
@@ -74,7 +74,7 @@ export default function UpdatePage() {
     setError("");
     try {
       const { data } = await axios.put(
-        `http://localhost:3000/${teamId}`,
+        `http://football.nickz.online/${teamId}`,
         form,
         {
           headers: {
@@ -92,7 +92,7 @@ export default function UpdatePage() {
     } finally {
       setSaving(false);
     }
-  }
+  };
 
   return (
     <section className="pt-10">

@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import Toastify from "toastify-js";
-import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
+import FormField from "../components/FormField.jsx";
+import { loginUser, loginWithGoogle, loginWithFacebook } from "../api/auth.js";
+import { saveToken } from "../auth/session.js";
 
 /* ── Facebook OAuth (JS SDK) ─────────────────────────────── */
 /* App ID dari developers.facebook.com (App Settings → Basic).
@@ -62,12 +64,9 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     try {
-      const { data } = await axios.post(`http://localhost:3000/login`, {
-        email,
-        password,
-      });
+      const data = await loginUser({ email, password });
 
-      localStorage.setItem("access_token", data.access_token);
+      saveToken(data.access_token);
       navigate("/");
       Toastify({
         text: "Success login",
@@ -106,18 +105,9 @@ export default function LoginPage() {
   async function handleGoogleLogin(credentialResponse) {
     setError("");
     try {
-      console.log(credentialResponse);
-      const { data } = await axios.post(
-        `http://localhost:3000/google-login`,
-        {},
-        {
-          headers: {
-            token: credentialResponse.credential,
-          },
-        },
-      );
+      const data = await loginWithGoogle(credentialResponse.credential);
 
-      localStorage.setItem("access_token", data.access_token);
+      saveToken(data.access_token);
       navigate("/");
       Toastify({
         text: "Success login",
@@ -193,17 +183,11 @@ export default function LoginPage() {
           "Facebook login was cancelled or the popup was blocked.",
         );
 
-      const { data } = await axios.post(
-        `http://localhost:3000/facebook-login`,
-        {},
-        {
-          headers: {
-            token: response.authResponse.accessToken,
-          },
-        },
+      const data = await loginWithFacebook(
+        response.authResponse.accessToken,
       );
 
-      localStorage.setItem("access_token", data.access_token);
+      saveToken(data.access_token);
       navigate("/");
       Toastify({
         text: "Success login",
@@ -256,19 +240,21 @@ export default function LoginPage() {
           </p>
 
           <form onSubmit={handleLogin} className="mt-6 flex flex-col gap-4">
-            <input
+            <FormField
               id="login-email"
               label="Email"
               type="email"
-              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              onChange={setEmail}
               placeholder="you@example.com"
               autoComplete="email"
             />
-            <input
+            <FormField
               id="login-password"
               label="Password"
               type="password"
-              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              onChange={setPassword}
               placeholder="••••••••"
               autoComplete="current-password"
             />

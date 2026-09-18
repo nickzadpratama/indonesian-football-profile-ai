@@ -1,11 +1,17 @@
 import ChatBotWidget from "../components/ChatBotWidget.jsx";
 import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
+import { isTokenValid, purgeInvalidToken } from "../auth/session.js";
 
-/** Sign-in form backed by the local auth store. Redirects back to where the user came from. */
+/**
+ * Layout untuk halaman yang butuh login. Token wajib ada & belum
+ * kedaluwarsa — kalau tidak, token dibersihkan lalu user dikirim ke /login
+ * (tanpa ini, token basi bikin app stuck di halaman yang selalu 401).
+ */
 export default function BaseLayout() {
-  if (!localStorage.access_token) {
-    return <Navigate to="/login" />;
+  if (!isTokenValid()) {
+    purgeInvalidToken();
+    return <Navigate to="/login" replace />;
   }
   return (
     <>

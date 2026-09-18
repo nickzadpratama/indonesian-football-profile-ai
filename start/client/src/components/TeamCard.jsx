@@ -5,6 +5,7 @@ import { hasVoted, onVotesChange, toggleVote } from "../data/votes.js";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import { toastifyError } from "../utils/toastify.js";
+import { API_BASE_URL, authHeaders } from "../api/auth.js";
 
 /**
  * Team card for the teams list. The cover + details navigate to the squad;
@@ -30,8 +31,7 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
       e.preventDefault();
 
       await axios.post(
-        // `https://football.nickz.online/`,
-        "http://localhost:3000/",
+        `${API_BASE_URL}/`,
         {
           name,
           code,

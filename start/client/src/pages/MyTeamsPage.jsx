@@ -4,22 +4,8 @@ import MyTeamCard from "../components/MyTeamCard.jsx";
 import { Loader, ErrorPanel } from "../components/Status.jsx";
 import { toastifyError } from "../utils/toastify.js";
 import axios from "axios";
-
-/** Read the logged-in user id from the access_token payload (JWT). */
-function getTokenUserId() {
-  try {
-    const token =
-      typeof localStorage === "undefined"
-        ? ""
-        : (localStorage.access_token ?? "");
-    const payload = JSON.parse(
-      atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/")),
-    );
-    return payload.id;
-  } catch {
-    return null;
-  }
-}
+import { API_BASE_URL, authHeaders } from "../api/auth.js";
+import { decodeToken } from "../auth/session.js";
 
 /** Shows every team you joined (saved on the server) as a MyTeamCard. */
 export default function MyTeamsPage() {
@@ -28,7 +14,7 @@ export default function MyTeamsPage() {
   const [error, setError] = useState("");
   const [phase, setPhase] = useState("loading"); // 'loading' | 'ok' | 'error'
   const [reloadKey, setReloadKey] = useState(0);
-  const userId = getTokenUserId();
+  const userId = decodeToken()?.id;
 
   useEffect(() => {
     let cancelled = false;

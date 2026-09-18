@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+import { API_BASE_URL } from "../api/auth.js";
 
 export const geminiSlice = createSlice({
   name: "gemini",
@@ -31,7 +32,7 @@ export const fetchAI = (input) => async (dispatch) => {
   try {
     dispatch(fetchPending());
 
-    const result = await axios.get(`http://football.nickz.online/genAI`, {
+    const result = await axios.get(`${API_BASE_URL}/genAI`, {
       params: { input },
     });
 

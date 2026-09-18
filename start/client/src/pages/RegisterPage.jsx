@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { register } from "../auth/store.js";
 import FormField from "../components/FormField.jsx";
-import { toast } from "../toast.js";
 import Toastify from "toastify-js";
-import axios from "axios";
+import { registerUser } from "../api/auth.js";
 
-/** Registration form backed by the local auth store (auto sign-in on success). */
+/**
+ * Registration form — POST /register ke server Football Hub, lalu user
+ * diarahkan ke /login untuk sign in dengan akun yang baru dibuat.
+ */
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -16,21 +17,13 @@ export default function RegisterPage() {
   const location = useLocation();
   const from = location.state?.from ?? "/";
 
-  console.log(username);
   async function handleRegister(e) {
+    e.preventDefault();
+    setError("");
     try {
-      e.preventDefault();
-      const { data } = await axios.post(
-        `http://football.nickz.online/register`,
-        {
-          username,
-          email,
-          password,
-        },
-      );
+      await registerUser({ username, email, password });
 
-      console.log(data);
-      navigate("/login");
+      navigate("/login", { state: { from } });
       Toastify({
         text: "Success register",
         duration: 3000,
@@ -47,8 +40,11 @@ export default function RegisterPage() {
       }).showToast();
     } catch (error) {
       console.log(error.response);
+      const message =
+        error.response?.data?.message ?? error.message ?? "Failed register";
+      setError(message);
       Toastify({
-        text: "Failed register",
+        text: message,
         duration: 3000,
         newWindow: true,
         close: true,

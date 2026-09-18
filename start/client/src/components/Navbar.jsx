@@ -1,13 +1,6 @@
 // import { Link, NavLink } from "react-router";
-import { useEffect, useState } from "react";
-import {
-  Link,
-  NavLink,
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router";
+import { useState } from "react";
+import { Link, NavLink, useLocation, useNavigate } from "react-router";
 // import TeamsPage from "./pages/TeamsPage.jsx";
 // import PlayersPage from "./pages/PlayersPage.jsx";
 // import PlayerProfilePage from "./pages/PlayerProfilePage.jsx";
@@ -15,30 +8,22 @@ import {
 // import LoginPage from "./pages/LoginPage.jsx";
 // import RegisterPage from "./pages/RegisterPage.jsx";
 // import UpdatePage from "./pages/UpdatePage.jsx";
-import { getSession, logout } from "../auth/store.js";
-import { getTeams } from "../api/football.js";
+import { clearToken, getCurrentUser } from "../auth/session.js";
 import { toast } from "../toast.js";
 
 /** Shared dark-mode form input with floating label. */
 export default function Navbar() {
-  const [session, setSession] = useState(() => getSession());
+  // Sesi asli dari JWT di localStorage (sebelumnya memakai store demo
+  // src/auth/store.js, sehingga header tetap "Sign in" walau sudah login).
+  const [user, setUser] = useState(() => getCurrentUser());
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const refresh = () => setSession(getSession());
-    window.addEventListener("football-hub-auth", refresh);
-    return () => window.removeEventListener("football-hub-auth", refresh);
-  }, []);
-
-  const goTeams = () => navigate("/");
-  const openSquad = (team) =>
-    navigate(`/teams/${team.team?.id}`, { state: { team } });
-
   const signOut = () => {
-    logout();
+    clearToken();
+    setUser(null);
     toast("Signed out. See you soon!", "neutral");
-    goTeams();
+    navigate("/login");
   };
 
   const navClass = (active) =>
@@ -81,7 +66,7 @@ export default function Navbar() {
               ← All teams
             </Link>
           )}
-          {session ? (
+          {user ? (
             <>
               <span className="hidden items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 text-[11px] font-semibold text-slate-200 ring-1 ring-white/10 sm:flex">
                 <span aria-hidden="true">👤</span>
