@@ -20,11 +20,14 @@ export default function RegisterPage() {
   async function handleRegister(e) {
     try {
       e.preventDefault();
-      const { data } = await axios.post(`http://localhost:3000/register`, {
-        username,
-        email,
-        password,
-      });
+      const { data } = await axios.post(
+        `http://football.nickz.online/register`,
+        {
+          username,
+          email,
+          password,
+        },
+      );
 
       console.log(data);
       navigate("/login");

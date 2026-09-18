@@ -31,7 +31,7 @@ export const fetchAI = (input) => async (dispatch) => {
   try {
     dispatch(fetchPending());
 
-    const result = await axios.get(`http://localhost:3000/genAI`, {
+    const result = await axios.get(`http://football.nickz.online/genAI`, {
       params: { input },
     });
 
