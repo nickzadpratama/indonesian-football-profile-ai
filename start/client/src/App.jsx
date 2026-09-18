@@ -17,6 +17,8 @@ import RegisterPage from "./pages/RegisterPage.jsx";
 
 import BaseLayout from "./layouts/BaseLayout.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
+import MyTeamsPage from "./pages/MyTeamsPage.jsx";
+import UpdatePage from "./pages/UpdatePage.jsx";
 
 const seasonFromParam = (raw) => {
   const year = Number(raw);
@@ -63,6 +65,8 @@ export default function App() {
 
             {/* <Route path="/:teamId" element={<SquadRoute />} /> */}
             <Route path="/team/:teamId" element={<PlayersPage />} />
+            <Route path="/myTeam" element={<MyTeamsPage />} />
+            <Route path="/myTeam/update/:teamId" element={<UpdatePage />} />
             <Route path="/players/:playerId" element={<ProfileRoute />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

@@ -122,12 +122,12 @@ export const fetchTeams = () => async (dispatch) => {
   }
 };
 
-export const fetchTeamPlayer = () => async (dispatch) => {
+export const fetchTeamPlayer = (teamId) => async (dispatch) => {
   try {
     console.log("object");
     dispatch(fetchPending());
     const result = await fetch(
-      `https://v3.football.api-sports.io/players/squads?team=1571`,
+      `https://v3.football.api-sports.io/players/squads?team=${teamId}`,
       // `https://v3.football.api-sports.io/players/squads?team=${teamId}`,
       {
         method: "GET",

@@ -1,49 +1,97 @@
-import { useState } from 'react'
-import { updateUser } from '../auth/store.js'
-import FormField from '../components/FormField.jsx'
-import { toast } from '../toast.js'
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import axios from "axios";
+import FormField from "../components/FormField.jsx";
+import { Loader, ErrorPanel } from "../components/Status.jsx";
+import { toast } from "../toast.js";
 
-/** Edit the signed-in profile (name / email / password). Requires current password. */
-export default function UpdatePage({ user, onNeedLogin, onBack }) {
-  const [name, setName] = useState(user?.name ?? '')
-  const [email, setEmail] = useState(user?.email ?? '')
-  const [currentPassword, setCurrentPassword] = useState('')
-  const [newPassword, setNewPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [error, setError] = useState('')
-  const [updated, setUpdated] = useState(false)
+/**
+ * Update a joined team (name / code / founded / stadium / city / capacity)
+ * via the server's PUT /:id endpoint. Reached from the "✎ Update" button
+ * on a MyTeamCard in My Teams. Current values are loaded first so the form
+ * always starts from the saved data.
+ */
+export default function UpdatePage() {
+  const { teamId } = useParams();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: "",
+    code: "",
+    founded: "",
+    stadium: "",
+    city: "",
+    capacity: "",
+  });
+  const [teamName, setTeamName] = useState("");
+  const [error, setError] = useState("");
+  const [phase, setPhase] = useState("loading"); // 'loading' | 'ok' | 'error'
+  const [saving, setSaving] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
 
-  if (!user) {
-    return (
-      <section className="pt-16 text-center">
-        <span aria-hidden="true" className="text-3xl">🔒</span>
-        <p className="mt-3 text-lg font-bold text-slate-200">Please sign in to edit your profile.</p>
-        <button
-          type="button"
-          onClick={onNeedLogin}
-          className="mt-4 rounded-lg bg-emerald-500/15 px-5 py-2.5 text-sm font-bold text-emerald-300 ring-1 ring-emerald-400/30 transition hover:bg-emerald-500/25"
-        >
-          Sign in →
-        </button>
-      </section>
-    )
-  }
+  useEffect(() => {
+    let cancelled = false;
 
-  const submit = (event) => {
-    event.preventDefault()
-    setUpdated(false)
-    const result = updateUser({ currentPassword, name, email, newPassword, confirmPassword })
-    if (!result.ok) {
-      setError(result.error)
-      toast(result.error, 'error')
-      return
+    axios
+      .get(`http://localhost:3000/${teamId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.access_token}`,
+        },
+      })
+      .then(({ data }) => {
+        if (cancelled) return;
+        const team = data.data ?? {};
+        setTeamName(team.name ?? "");
+        setForm({
+          name: team.name ?? "",
+          code: team.code ?? "",
+          founded: team.founded ?? "",
+          stadium: team.stadium ?? "",
+          city: team.city ?? "",
+          capacity: team.capacity ?? "",
+        });
+        setPhase("ok");
+      })
+      .catch((err) => {
+        if (cancelled) return;
+        const message = err?.response?.data?.message ?? err?.message;
+        setError(message);
+        setPhase("error");
+        toast(message, "error");
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [teamId, reloadKey]);
+
+  const setField = (key) => (value) =>
+    setForm((prev) => ({ ...prev, [key]: value }));
+
+  const submit = async (event) => {
+    event.preventDefault();
+    if (saving) return;
+    setSaving(true);
+    setError("");
+    try {
+      const { data } = await axios.put(
+        `http://localhost:3000/${teamId}`,
+        form,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.access_token}`,
+          },
+        },
+      );
+      toast(data?.message ?? "Team updated successfully ✓", "success");
+      navigate("/myTeam");
+    } catch (err) {
+      const message =
+        err?.response?.data?.message ?? err?.message ?? "Failed to update team";
+      setError(message);
+      toast(message, "error");
+    } finally {
+      setSaving(false);
     }
-    setError('')
-    setCurrentPassword('')
-    setNewPassword('')
-    setConfirmPassword('')
-    setUpdated(true)
-    toast('Profile updated successfully ✓', 'success')
   }
 
   return (
@@ -53,9 +101,9 @@ export default function UpdatePage({ user, onNeedLogin, onBack }) {
           <div className="flex items-center justify-between">
             <button
               type="button"
-              onClick={onBack}
+              onClick={() => navigate("/myTeam")}
               className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-slate-200 ring-1 ring-white/20 transition hover:bg-white/20"
-              aria-label="Back"
+              aria-label="Back to my teams"
             >
               ←
             </button>
@@ -63,76 +111,107 @@ export default function UpdatePage({ user, onNeedLogin, onBack }) {
               ✎
             </span>
           </div>
-          <h1 className="mt-3 text-center text-2xl font-black tracking-tight text-white">Update profile</h1>
+          <h1 className="mt-3 text-center text-2xl font-black tracking-tight text-white">
+            Update team
+          </h1>
           <p className="mt-1 text-center text-sm text-slate-400">
-            Signed in as <span className="font-semibold text-emerald-300">{user.email}</span>
+            {teamName ? (
+              <>
+                Editing{" "}
+                <span className="font-semibold text-emerald-300">
+                  {teamName}
+                </span>
+              </>
+            ) : (
+              "Edit your joined team details."
+            )}
           </p>
 
-          <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
-            <FormField
-              id="update-name"
-              label="Full name"
-              type="text"
-              value={name}
-              onChange={setName}
-              placeholder="Your name"
-              autoComplete="name"
-            />
-            <FormField
-              id="update-email"
-              label="Email"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              placeholder="you@example.com"
-              autoComplete="email"
-            />
-            <FormField
-              id="update-current"
-              label="Current password (required)"
-              type="password"
-              value={currentPassword}
-              onChange={setCurrentPassword}
-              placeholder="••••••••"
-              autoComplete="current-password"
-            />
-            <FormField
-              id="update-new"
-              label="New password"
-              type="password"
-              value={newPassword}
-              onChange={setNewPassword}
-              placeholder="Leave blank to keep"
-              autoComplete="new-password"
-            />
-            <FormField
-              id="update-confirm"
-              label="Confirm new password"
-              type="password"
-              value={confirmPassword}
-              onChange={setConfirmPassword}
-              placeholder="••••••••"
-              autoComplete="new-password"
-            />
-            {error && (
-              <p role="alert" className="rounded-lg bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30">
-                {error}
-              </p>
-            )}
-            {updated && (
-              <p role="status" className="rounded-lg bg-emerald-500/10 px-3 py-2 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-400/30">
-                ✓ Your profile has been updated.
-              </p>
-            )}
-            <button
-              type="submit"
-              className="w-full rounded-lg bg-emerald-500/20 py-2.5 text-sm font-black text-emerald-300 ring-1 ring-emerald-400/40 transition hover:bg-emerald-500/30"
-            >
-              Save changes →
-            </button>
-          </form>
+          {phase === "loading" && (
+            <div className="mt-6">
+              <Loader label="Loading team…" />
+            </div>
+          )}
+          {phase === "error" && (
+            <div className="mt-6">
+              <ErrorPanel
+                message={error}
+                onRetry={() => {
+                  setPhase("loading");
+                  setReloadKey((key) => key + 1);
+                }}
+              />
+            </div>
+          )}
+          {phase === "ok" && (
+            <form onSubmit={submit} className="mt-6 flex flex-col gap-4">
+              <FormField
+                id="update-name"
+                label="Team name"
+                type="text"
+                value={form.name}
+                onChange={setField("name")}
+                placeholder="Team name"
+              />
+              <FormField
+                id="update-code"
+                label="Code"
+                type="text"
+                value={form.code}
+                onChange={setField("code")}
+                placeholder="e.g. PSB"
+              />
+              <FormField
+                id="update-founded"
+                label="Founded"
+                type="text"
+                value={form.founded}
+                onChange={setField("founded")}
+                placeholder="e.g. 1954"
+              />
+              <FormField
+                id="update-stadium"
+                label="Stadium"
+                type="text"
+                value={form.stadium}
+                onChange={setField("stadium")}
+                placeholder="Stadium name"
+              />
+              <FormField
+                id="update-city"
+                label="City"
+                type="text"
+                value={form.city}
+                onChange={setField("city")}
+                placeholder="City"
+              />
+              <FormField
+                id="update-capacity"
+                label="Capacity"
+                type="text"
+                value={form.capacity}
+                onChange={setField("capacity")}
+                placeholder="e.g. 38000"
+              />
+              {error && (
+                <p
+                  role="alert"
+                  className="rounded-lg bg-rose-500/10 px-3 py-2 text-xs font-semibold text-rose-300 ring-1 ring-rose-400/30"
+                >
+                  {error}
+                </p>
+              )}
+              <button
+                type="submit"
+                disabled={saving}
+                className="w-full rounded-lg bg-emerald-500/20 py-2.5 text-sm font-black text-emerald-300 ring-1 ring-emerald-400/40 transition hover:bg-emerald-500/30 disabled:opacity-60"
+              >
+                {saving ? "Saving…" : "Save changes →"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     </section>
-  )
+  );
 }
