@@ -1,12 +1,10 @@
 @import "tailwindcss";
 
-/* Class-based dark mode variant (Tailwind CSS v4) */
 @custom-variant dark {
   &: where(.dark, .dark *) {
-    @slot; /* 👈 Tambahkan ini agar compiler tidak error */
+    @slot;
   }
 }
-/* @custom-variant dark (&:where(.dark, .dark *)); */
 
 @layer base {
   html {
@@ -18,7 +16,6 @@
   }
 }
 
-/* ── Toastify — dark theme (matches app) ─────────────── */
 .toastify {
   display: flex;
   align-items: center;

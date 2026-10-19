@@ -1,4 +1,3 @@
-// Isolated HTTP contract tests: no sync, migrations, or database connections.
 jest.mock("../models", () => ({
   User: { findByPk: jest.fn() },
   FanClub: { findOne: jest.fn(), findOrCreate: jest.fn() },

@@ -3,14 +3,22 @@ import { useSelector, useDispatch } from "react-redux";
 import PlayerCard from "../components/PlayerCard.jsx";
 import Avatar from "../components/Avatar.jsx";
 import { ErrorPanel } from "../components/Status.jsx";
-import gifLoading from "../components/assets/vecteezy_loading-bar-progress-with-green-color-vector-illustration_14945926.svg";
+import LoadingIndicator from "../components/LoadingIndicator.jsx";
 import { fetchTeamPlayer } from "../features/team/teamSlice.js";
 import { toastifyError } from "../utils/toastify.js";
 import { useParams } from "react-router-dom";
 
 export default function PlayersPage() {
-  const { data, loading, error } = useSelector((state) => state.team);
   const { teamId } = useParams();
+  const squadState = useSelector(
+    (state) =>
+      state.team.squads[String(teamId)] ?? {
+        data: [],
+        loading: true,
+        error: "",
+      },
+  );
+  const { data, loading, error } = squadState;
 
   const dispatch = useDispatch();
 
@@ -25,7 +33,7 @@ export default function PlayersPage() {
   if (loading) {
     return (
       <div className="flex justify-center mt-28">
-        <img src={gifLoading} className="w-1/5" alt="Loading squad" />
+        <LoadingIndicator label="Loading squad…" className="w-1/5 min-w-24 max-w-48" />
       </div>
     );
   }
@@ -36,13 +44,12 @@ export default function PlayersPage() {
       <div className="mt-6">
         <ErrorPanel
           message={error?.response?.data?.message ?? error}
-          onRetry={() => dispatch(fetchTeamPlayer(teamId))}
+          onRetry={() => dispatch(fetchTeamPlayer(teamId, { force: true }))}
         />
       </div>
     );
   }
 
-  // api-sports /players/squads menjawab: [{ team: {...}, players: [{...}] }]
   const squadList = Array.isArray(data) ? data : [];
   const entry = squadList.find(
     (item) => String(item?.team?.id) === String(teamId),
@@ -54,7 +61,7 @@ export default function PlayersPage() {
   return (
     <>
       <section className="relative pt-2">
-        {/* ── Team banner ──────────────────────────── */}
+
         <div className="relative overflow-hidden rounded-2xl bg-slate-900/80 ring-1 ring-white/10 shadow-lg shadow-slate-950/40">
           <div className="absolute inset-0 bg-gradient-to-br from-slate-950/70 via-slate-950/40 to-slate-900/80" />
 
@@ -84,7 +91,6 @@ export default function PlayersPage() {
           </div>
         </div>
 
-        {/* ── Squad grid (satu PlayerCard per pemain) ── */}
         {players.length === 0 ? (
           <div className="mt-6 rounded-2xl bg-white/5 py-12 text-center text-sm text-slate-400 ring-1 ring-white/10">
             No squad players found for this team.

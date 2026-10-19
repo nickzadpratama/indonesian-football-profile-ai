@@ -80,8 +80,6 @@ const getCompanyNews = async (symbol, fromDate, toDate) => {
   }
 };
 
-// Berita crypto umum (Finnhub /company-news tidak mendukung simbol crypto).
-// Endpoint: GET /news?category=crypto — shape item-nya sama dengan company-news.
 const getCryptoNews = async (fromDate, toDate) => {
   try {
     const { data } = await finnhubClient.get('/news', {

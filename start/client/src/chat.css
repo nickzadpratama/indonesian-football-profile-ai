@@ -1,11 +1,8 @@
-/** Chatbot widget (dark theme, matches app). */
-
 @custom-variant dark {
   &: where(.dark, .dark *) {
-    @slot; /* 👈 Tambahkan ini agar compiler tidak error */
+    @slot;
   }
 }
-/* @custom-variant dark (&:where(.dark, .dark *)); */
 
 .chat-open {
   --chat-open: 1;
@@ -45,7 +42,6 @@
   border-radius: 8px;
 }
 
-/* typing dots */
 @keyframes dot-pulse {
   0% {
     opacity: 0.25;

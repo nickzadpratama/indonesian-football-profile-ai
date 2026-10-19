@@ -1,9 +1,3 @@
-// Session helpers for the real server session (JWT saved in localStorage).
-//
-// Dipakai bersama oleh LoginPage/RegisterPage (menyimpan token) dan
-// AuthLayout/BaseLayout/Navbar (membaca & memvalidasi token). Token yang
-// sudah kedaluwarsa dibersihkan supaya user tidak "terkunci" dari halaman
-// login ataupun terjebak di halaman yang selalu 401.
 const TOKEN_KEY = "access_token";
 const AUTH_CHANGE_EVENT = "football-hub:auth-change";
 
@@ -13,7 +7,6 @@ function notifyAuthChange() {
   }
 }
 
-/** Raw access_token ("" kalau belum login / storage tidak tersedia). */
 export function getToken() {
   try {
     if (typeof localStorage === "undefined") return "";
@@ -23,25 +16,23 @@ export function getToken() {
   }
 }
 
-/** Simpan access_token hasil login/register. */
 export function saveToken(token) {
   try {
     if (typeof localStorage === "undefined" || !token) return;
     localStorage.setItem(TOKEN_KEY, token);
     notifyAuthChange();
   } catch {
-    /* storage unavailable */
+    return;
   }
 }
 
-/** Hapus access_token (sign out). */
 export function clearToken() {
   try {
     if (typeof localStorage === "undefined") return;
     localStorage.removeItem(TOKEN_KEY);
     notifyAuthChange();
   } catch {
-    /* ignore */
+    return;
   }
 }
 
@@ -76,7 +67,6 @@ export function subscribeToAuthChanges(callback) {
   };
 }
 
-/** Decode payload JWT (tanpa verifikasi tanda tangan — itu tugas server). */
 export function decodeToken(token = getToken()) {
   try {
     const part = String(token).split(".")[1];
@@ -88,7 +78,6 @@ export function decodeToken(token = getToken()) {
   }
 }
 
-/** true kalau token ada dan belum kedaluwarsa. */
 export function isTokenValid(token = getToken()) {
   const payload = decodeToken(token);
   if (!payload) return false;
@@ -96,7 +85,6 @@ export function isTokenValid(token = getToken()) {
   return payload.exp * 1000 > Date.now();
 }
 
-/** User yang sedang login dari payload token → { id, email, name } | null. */
 export function getCurrentUser(token = getToken()) {
   const payload = decodeToken(token);
   if (!payload || !isTokenValid(token)) return null;
@@ -108,7 +96,6 @@ export function getCurrentUser(token = getToken()) {
   };
 }
 
-/** Buang token yang tidak valid/kedaluwarsa (idempotent). */
 export function purgeInvalidToken() {
   const token = getToken();
   if (token && !isTokenValid(token)) clearToken();

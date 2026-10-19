@@ -18,30 +18,25 @@ async function requestSports(path) {
   return data.response;
 }
 
-/** GET /sports/teams?country=… → list of { team, venue }. */
 export function getTeams(country = "Indonesia") {
   return requestSports(`teams?country=${encodeURIComponent(country)}`);
 }
 
-/** GET /sports/teams?id=… → list containing the matching { team, venue }. */
 export function getTeamDetails(teamId) {
   return requestSports(`teams?id=${encodeURIComponent(teamId)}`);
 }
 
-/** GET /sports/squads?team=… → { team, players[] }. */
 export async function getSquad(teamId) {
   const entries = await requestSports(`squads?team=${encodeURIComponent(teamId)}`);
   return entries[0] ?? { team: null, players: [] };
 }
 
-/** GET /sports/players?id=…&season=… → API-Sports response entries. */
 export function getPlayerStatistics(playerId, season) {
   return requestSports(
     `players?id=${encodeURIComponent(playerId)}&season=${encodeURIComponent(season)}`,
   );
 }
 
-/** Return player details for the requested season or the newest available season. */
 export async function getPlayerStats(playerId, season) {
   const seasons = season === undefined ? SEASONS : [season];
   for (const candidate of seasons) {

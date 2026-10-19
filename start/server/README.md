@@ -257,6 +257,12 @@ Set `API_SPORTS_KEY` in the backend environment (`start/server/.env` locally or
 the backend host's secret settings in production). Do not add it to a `VITE_`
 variable or commit the actual key.
 
+Successful provider responses are cached in backend memory for five minutes
+(up to 100 query variants), and concurrent identical requests share one
+provider call. This prevents repeated navigation from consuming quota on a
+single long-lived backend process. In serverless hosting the cache is
+best-effort and can be cleared whenever an instance is recycled.
+
 The UI disables duplicate joins, waits for server confirmation, exposes retryable
 errors, reloads on login/navigation/window focus, and discards results from an
 obsolete session. Leave requires confirmation. National teams are also permitted.

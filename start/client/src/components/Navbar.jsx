@@ -4,10 +4,8 @@ import useSessionToken from "../auth/useSessionToken.js";
 import { toastifyError } from "../utils/toastify.js";
 import MusicPlayer from "./MusicPlayer.jsx";
 
-/** Shared dark-mode form input with floating label. */
 export default function Navbar() {
-  // Sesi asli dari JWT di localStorage (sebelumnya memakai store demo
-  // src/auth/store.js, sehingga header tetap "Sign in" walau sudah login).
+
   const token = useSessionToken();
   const user = getCurrentUser(token);
   const navigate = useNavigate();

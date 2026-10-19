@@ -1,7 +1,9 @@
+import LoadingIndicator from './LoadingIndicator.jsx';
+
 export function Loader({ label = 'Loading…' }) {
   return (
     <div className="flex flex-col items-center justify-center gap-4 rounded-2xl bg-white/5 py-20 ring-1 ring-white/10">
-      <span className="h-10 w-10 animate-spin rounded-full border-2 border-slate-500 border-t-white" />
+      <LoadingIndicator label={label} />
       <p className="text-sm font-medium text-slate-300">{label}</p>
     </div>
   )

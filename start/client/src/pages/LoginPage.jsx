@@ -3,18 +3,16 @@ import { useLocation, useNavigate } from "react-router-dom";
 import Toastify from "toastify-js";
 import { GoogleLogin } from "@react-oauth/google";
 import FormField from "../components/FormField.jsx";
+import LoadingIndicator from "../components/LoadingIndicator.jsx";
 import { loginUser, loginWithGoogle, loginWithFacebook } from "../api/auth.js";
 import { saveToken } from "../auth/session.js";
 
-/* ── Facebook OAuth (JS SDK) ─────────────────────────────── */
-/* Set this to the Facebook App ID from App Settings → Basic. */
 const FACEBOOK_APP_ID = import.meta.env.VITE_FACEBOOK_APP_ID?.trim();
 const FB_SDK_URL = "https://connect.facebook.net/en_US/sdk.js";
 const FB_SDK_VERSION = "v23.0";
 
 let fbSdkPromise = null;
 
-/** Lazy-load the Facebook JS SDK once, then FB.init() with the app id. */
 function loadFacebookSdk() {
   if (!FACEBOOK_APP_ID) {
     return Promise.reject(
@@ -62,7 +60,6 @@ function loadFacebookSdk() {
   return fbSdkPromise;
 }
 
-/** Sign-in form backed by the local auth store. Redirects back to where the user came from. */
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -106,14 +103,14 @@ export default function LoginPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#34D399",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     } catch (error) {
       console.log(error.response);
@@ -123,14 +120,14 @@ export default function LoginPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#F87171",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     }
   }
@@ -147,14 +144,14 @@ export default function LoginPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#34D399",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     } catch (error) {
       console.log(error.response);
@@ -164,19 +161,18 @@ export default function LoginPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#F87171",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     }
   }
 
-  /* Load the SDK before a click so Facebook's popup is not blocked. */
   useEffect(() => {
     if (!FACEBOOK_APP_ID) return;
 
@@ -196,12 +192,6 @@ export default function LoginPage() {
     };
   }, []);
 
-  /**
-   * Facebook OAuth login — mirrors handleGoogleLogin: FB.login() returns a
-   * user access token which is sent to POST /facebook-login via the `token`
-   * header; the server verifies it against the Graph API, find-or-creates
-   * the user, and returns our own access_token.
-   */
   async function handleFacebookLogin() {
     setError("");
     if (facebookLoginPending) return;
@@ -258,14 +248,14 @@ export default function LoginPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#34D399",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     } catch (error) {
       if (FACEBOOK_APP_ID && facebookSdkStatus !== "ready") {
@@ -279,14 +269,14 @@ export default function LoginPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#F87171",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     } finally {
       setFacebookLoginPending(false);
@@ -374,10 +364,7 @@ export default function LoginPage() {
             >
               {facebookLoginPending || facebookSdkStatus === "loading" ? (
                 <>
-                  <span
-                    aria-hidden="true"
-                    className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
-                  />
+                  <LoadingIndicator label="Connecting to Facebook…" className="h-8 w-8" />
                   Connecting to Facebook…
                 </>
               ) : facebookSdkStatus === "error" ? (

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./ChatBotWidget.css";
+import LoadingIndicator from "./LoadingIndicator.jsx";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAI, fetchFailed } from "../features/gemini/geminiSlice";
 import useSessionToken from "../auth/useSessionToken.js";
@@ -190,11 +191,7 @@ function AuthenticatedChatBot() {
               {isProcessing && (
                 <div className="bot-message bot typing-indicator">
                   <div className="bot-bubble">
-                    <div className="typing-dots">
-                      <span />
-                      <span />
-                      <span />
-                    </div>
+                    <LoadingIndicator label="Menyiapkan jawaban…" className="h-16 w-16" />
                   </div>
                 </div>
               )}

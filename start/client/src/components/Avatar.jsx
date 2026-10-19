@@ -10,10 +10,6 @@ function initials(name) {
     .toUpperCase()
 }
 
-/**
- * Renders an `<img>` with a graceful initials-fallback when the API image
- * is missing or fails to load. `className` must include the sizing classes.
- */
 export default function Avatar({ src, name, rounded = 'rounded-full', className = '' }) {
   const [failed, setFailed] = useState(false)
 

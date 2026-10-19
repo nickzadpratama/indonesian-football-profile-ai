@@ -4,10 +4,6 @@ import FormField from "../components/FormField.jsx";
 import Toastify from "toastify-js";
 import { registerUser } from "../api/auth.js";
 
-/**
- * Registration form — POST /register ke server Football Hub, lalu user
- * diarahkan ke /login untuk sign in dengan akun yang baru dibuat.
- */
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -29,14 +25,14 @@ export default function RegisterPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#34D399",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     } catch (error) {
       console.log(error.response);
@@ -48,14 +44,14 @@ export default function RegisterPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#F87171",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     }
   }

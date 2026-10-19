@@ -2,7 +2,7 @@ SECRET_KEY
 GOOGLE_CLIENT_ID
 FACEBOOK_APP_SECRET
 GEMINI_API_KEY
-# Optional Gemini model override.
+
 GEMINI_MODEL=gemini-3.8-flash
-# Keep this provider key on the backend only; never expose it via a VITE_ variable.
+
 API_SPORTS_KEY=

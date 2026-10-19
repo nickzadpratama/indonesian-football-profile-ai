@@ -1,29 +1,3 @@
-/**
- * ============================================================================
- * GoogleJoinDemoPage — halaman demo Google OAuth + Join Clubs  (FILE BARU)
- * ============================================================================
- * FILE BARU — tidak mengubah satu baris pun source code aplikasi.
- *
- * Dipanggil dari entry demo src/main-google.jsx (dibungkus GoogleOAuthProvider
- * dengan pola yang sama seperti src/main.jsx).
- *
- * Alur:
- *   1. Belum ada access_token -> tampilkan tombol <GoogleLogin />
- *      (dari @react-oauth/google, sama seperti di LoginPage.jsx)
- *   2. handleGoogleLogin mengirim credential ke server
- *      (header `token`, sama seperti handleGoogleLogin di LoginPage.jsx)
- *   3. access_token disimpan -> tampilkan <JoinClubsPage />
- *      (postJoin + tampilan data berjalan)
- *
- * Catatan server (hanya PENGINGAT — server tidak saya ubah sama sekali):
- *   - Route POST /google-login belum terdaftar di start/server/routers/index.js
- *     (bila mau, tambahkan sendiri: router.post("/google-login", AuthController.googleLogin);)
- *   - Di authController.googleLogin ada typo `OAuthe2Client` (seharusnya
- *     OAuth2Client) dan memakai verifyToken(payload) untuk membuat token
- *     (biasanya signToken(payload)); silakan disesuaikan sendiri bila perlu.
- * ============================================================================
- */
-
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import Toastify from "toastify-js";
@@ -34,11 +8,10 @@ import { toastifyError } from "../utils/toastify.js";
 export default function GoogleJoinDemoPage() {
   const [accessToken, setAccessToken] = useState(localStorage.access_token);
 
-  // Sama seperti handleGoogleLogin di LoginPage.jsx
   async function handleGoogleLogin(credentialResponse) {
     try {
       const { data } = await axios.post(
-        // `https://football.nickz.online/google-login`,
+
         "http://localhost:3000/google-login",
         {},
         {
@@ -55,14 +28,14 @@ export default function GoogleJoinDemoPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#34D399",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     } catch (error) {
       console.log(error.response);
@@ -71,14 +44,14 @@ export default function GoogleJoinDemoPage() {
         duration: 3000,
         newWindow: true,
         close: true,
-        gravity: "bottom", // `top` or `bottom`
-        position: "right", // `left`, `center` or `right`
+        gravity: "bottom",
+        position: "right",
         stopOnFocus: true,
         style: {
           background: "#F87171",
           color: "black",
         },
-        onClick: function () {}, // Callback after click
+        onClick: function () {},
       }).showToast();
     }
   }

@@ -9,21 +9,19 @@ let testUser;
 let testStock;
 
 beforeAll(async () => {
-  // Create test user
+
   testUser = await sequelize.models.User.create({
     email: 'stocktester@example.com',
     password: hashPassword('password123'),
     name: 'Stock Tester',
   });
 
-  // Generate access token
   access_token = signToken({
     id: testUser.id,
     email: testUser.email,
     name: testUser.name,
   });
 
-  // Create test stock
   testStock = await sequelize.models.Stock.create({
     symbol: 'TEST',
     name: 'Test Stock Inc.',
@@ -31,7 +29,6 @@ beforeAll(async () => {
     exchange: 'NASDAQ',
   });
 
-  // Create test quote
   await sequelize.models.Quote.create({
     stock_id: testStock.id,
     current_price: 150.00,
@@ -43,7 +40,6 @@ beforeAll(async () => {
     previous_close: 147.50,
   });
 
-  // Create test candles
   const candles = [];
   const baseDate = new Date();
   for (let i = 0; i < 30; i++) {
@@ -64,7 +60,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // Clean up test data
+
   await sequelize.models.Candle.destroy({
     where: { stock_id: testStock?.id },
   });
@@ -140,11 +136,10 @@ describe('GET /api/stocks/:symbol/history', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('data');
-      
-      // Check that all candles are within 1 month range
+
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-      
+
       res.body.data.forEach(candle => {
         const candleDate = new Date(candle.datetime);
         expect(candleDate.getTime()).toBeGreaterThanOrEqual(oneMonthAgo.getTime());
@@ -156,11 +151,10 @@ describe('GET /api/stocks/:symbol/history', () => {
 
       expect(res.status).toBe(200);
       expect(res.body).toHaveProperty('data');
-      
-      // Check that all candles are within 3 months range
+
       const threeMonthsAgo = new Date();
       threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-      
+
       res.body.data.forEach(candle => {
         const candleDate = new Date(candle.datetime);
         expect(candleDate.getTime()).toBeGreaterThanOrEqual(threeMonthsAgo.getTime());

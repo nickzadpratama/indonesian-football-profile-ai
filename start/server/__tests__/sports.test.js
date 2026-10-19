@@ -51,6 +51,19 @@ test.each([
   );
 });
 
+test("reuses successful provider responses for repeated requests", async () => {
+  const first = await request(app)
+    .get("/sports/teams?country=Cacheland")
+    .set(auth);
+  const second = await request(app)
+    .get("/sports/teams?country=Cacheland")
+    .set(auth);
+
+  expect(first.status).toBe(200);
+  expect(second.status).toBe(200);
+  expect(axios.get).toHaveBeenCalledTimes(1);
+});
+
 test("requires a valid login", async () => {
   expect((await request(app).get("/sports/teams?country=Indonesia")).status).toBe(401);
 });
@@ -79,9 +92,24 @@ test("does not call provider without a configured server key", async () => {
 test("reports provider errors without returning a success-shaped response", async () => {
   axios.get.mockRejectedValue(new Error("upstream unavailable"));
   const response = await request(app)
-    .get("/sports/teams?country=Indonesia")
+    .get("/sports/teams?country=OfflineLand")
     .set(auth);
 
   expect(response.status).toBe(503);
   expect(response.body).toHaveProperty("message");
+});
+
+test("explains provider quota errors", async () => {
+  axios.get.mockResolvedValue({
+    data: {
+      response: [],
+      errors: { requests: "You have reached the request limit" },
+    },
+  });
+  const response = await request(app)
+    .get("/sports/teams?country=Limitland")
+    .set(auth);
+
+  expect(response.status).toBe(503);
+  expect(response.body.message).toMatch(/rate limit/i);
 });

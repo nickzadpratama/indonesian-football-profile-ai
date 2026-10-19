@@ -4,6 +4,7 @@ import useSessionToken from "../auth/useSessionToken.js";
 import { isTokenValid } from "../auth/session.js";
 import { changeMembership, fetchMemberships } from "../features/membership/membershipSlice.js";
 import { toastifyError } from "../utils/toastify.js";
+import LoadingIndicator from "./LoadingIndicator.jsx";
 
 export default function MembershipButton({ teamId, name, allowLeave = false }) {
   const token = useSessionToken();
@@ -40,6 +41,12 @@ export default function MembershipButton({ teamId, name, allowLeave = false }) {
         aria-label={`${joined ? (allowLeave ? "Leave Fans Club" : "Joined Fans Club") : "Join Fans Club"}: ${name}`}
         className="rounded-lg bg-emerald-500/15 px-2.5 py-1.5 text-[11px] font-bold text-emerald-300 ring-1 ring-emerald-400/30 transition hover:bg-emerald-500/25 disabled:cursor-default disabled:opacity-60"
       >
+        {(loading || pending) && (
+          <LoadingIndicator
+            label={loading ? "Checking membership…" : joined ? "Leaving…" : "Joining…"}
+            className="mr-1 h-8 w-8"
+          />
+        )}
         {loading ? "Checking membership…" : pending ? (joined ? "Leaving…" : "Joining…")
           : state.phase === "error" ? "Retry membership check"
             : joined ? (allowLeave ? "Leave Fans Club" : "Joined ✓") : "Join Fans Club"}

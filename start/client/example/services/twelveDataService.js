@@ -9,25 +9,22 @@ const twelveDataClient = axios.create({
   timeout: 15000,
 });
 
-// Maksimalkan outputsize sampai 5000 (max API) untuk data lebih lengkap
-// Berdasarkan dokumentasi: 1 request = 1 credit, max 5000 data point
 const TIME_SERIES_INTERVAL_MAP = {
-  '1m': { interval: '1day', outputsize: 252 },      // ~1 tahun hari trading
-  '3m': { interval: '1day', outputsize: 5000 },      // Max: ~20 tahun data harian
-  '1y': { interval: '1day', outputsize: 5000 },      // Max: ~20 tahun data harian
-  '5y': { interval: '1day', outputsize: 5000 },      // Max: ~20 tahun data harian
+  '1m': { interval: '1day', outputsize: 252 },
+  '3m': { interval: '1day', outputsize: 5000 },
+  '1y': { interval: '1day', outputsize: 5000 },
+  '5y': { interval: '1day', outputsize: 5000 },
 };
 
-// Interval langsung dari client: 5m, 15m, 30m, 1h, 4h, 1d, 1w, 1M
 const CLIENT_INTERVAL_MAP = {
-  '5m': { interval: '5min', outputsize: 5000 },      // ~2 minggu data 5-min
-  '15m': { interval: '15min', outputsize: 5000 },    // ~2 bulan data 15-min
-  '30m': { interval: '30min', outputsize: 5000 },    // ~3 bulan data 30-min
-  '1h': { interval: '1h', outputsize: 5000 },        // ~7 bulan data 1-jam
-  '4h': { interval: '4h', outputsize: 5000 },        // ~2.2 tahun data 4-jam
-  '1d': { interval: '1day', outputsize: 5000 },      // ~20 tahun data harian
-  '1w': { interval: '1week', outputsize: 5000 },     // ~96 tahun data mingguan
-  '1M': { interval: '1month', outputsize: 5000 },    // ~416 tahun data bulanan
+  '5m': { interval: '5min', outputsize: 5000 },
+  '15m': { interval: '15min', outputsize: 5000 },
+  '30m': { interval: '30min', outputsize: 5000 },
+  '1h': { interval: '1h', outputsize: 5000 },
+  '4h': { interval: '4h', outputsize: 5000 },
+  '1d': { interval: '1day', outputsize: 5000 },
+  '1w': { interval: '1week', outputsize: 5000 },
+  '1M': { interval: '1month', outputsize: 5000 },
 };
 
 const getTimeSeries = async (symbol, range = '1m', intervalOverride = null) => {
@@ -39,7 +36,7 @@ const getTimeSeries = async (symbol, range = '1m', intervalOverride = null) => {
 
     const { data } = await twelveDataClient.get('/time_series', {
       params: {
-        // crypto (mis. BTC) dipetakan ke format Twelve Data: "BTC/USD"
+
         symbol: toTwelveDataSymbol(symbol),
         interval,
         outputsize,
@@ -70,9 +67,6 @@ const getTimeSeries = async (symbol, range = '1m', intervalOverride = null) => {
   }
 };
 
-// Quote crypto via Twelve Data /quote (Finnhub /quote REST hanya untuk saham US).
-// Response field-nya sama bentuknya dengan getQuote Finnhub supaya controller/cron
-// tidak perlu tahu bedanya.
 const getCryptoQuote = async (symbol) => {
   try {
     const { data } = await twelveDataClient.get('/quote', {

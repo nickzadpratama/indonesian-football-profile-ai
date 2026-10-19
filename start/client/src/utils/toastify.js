@@ -7,8 +7,8 @@ const showToast = (message, background) => {
     duration: 3000,
     newWindow: true,
     close: true,
-    gravity: "top", // `top` or `bottom`
-    position: "right", // `left`, `center` or `right`
+    gravity: "top",
+    position: "right",
     stopOnFocus: true,
     style: {
       background,
@@ -17,7 +17,7 @@ const showToast = (message, background) => {
       borderRadius: "12px",
       boxShadow: "0 12px 40px rgba(0, 0, 0, 0.55)",
     },
-    onClick: function () {}, // Callback after click
+    onClick: function () {},
   }).showToast();
 };
 

@@ -21,7 +21,7 @@ const connectFinnhubWS = () => {
   finnhubWs.on('open', () => {
     console.log('[Socket] Connected to Finnhub WebSocket');
     subscribedSymbols.forEach((symbol) => {
-      // crypto perlu format Finnhub WS (mis. BTC -> BINANCE:BTCUSDT)
+
       finnhubWs.send(JSON.stringify({ type: 'subscribe', symbol: toFinnhubWsSymbol(symbol) }));
     });
   });
@@ -31,7 +31,7 @@ const connectFinnhubWS = () => {
       const message = JSON.parse(data.toString());
       if (message.type === 'trade' && message.data) {
         message.data.forEach((trade) => {
-          // trade.s dari Finnhub bisa "BINANCE:BTCUSDT" -> kembalikan ke room "BTC"
+
           const roomSymbol = fromFinnhubWsSymbol(trade.s);
           handleTradeUpdate({ ...trade, s: roomSymbol });
         });
@@ -71,8 +71,6 @@ const handleTradeUpdate = async (trade) => {
     candle.timestamp = timestamp;
   }
 
-  // Throttle 1x/detik per simbol: data candle selalu di-update dari tiap trade,
-  // tapi emit 'candle-update' ke room maksimal sekali per detik.
   if (throttleTimers.has(symbol)) {
     return;
   }
@@ -82,7 +80,7 @@ const handleTradeUpdate = async (trade) => {
     setTimeout(() => {
       const candle = liveCandles.get(symbol);
       if (candle && io) {
-        // Chart detail (per room simbol) — OHLC lengkap.
+
         io.to(symbol).emit('candle-update', {
           symbol,
           open: candle.open,
@@ -91,8 +89,7 @@ const handleTradeUpdate = async (trade) => {
           close: candle.close,
           timestamp: candle.timestamp,
         });
-        // Card harga (broadcast global) — didengar Stocks/Home/Watchlist.
-        // Client yang filter per simbol via realtimePrices[symbol].
+
         io.emit('price-update', {
           symbol,
           price: candle.close,

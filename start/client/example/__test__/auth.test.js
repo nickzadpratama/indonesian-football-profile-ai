@@ -8,19 +8,17 @@ let access_token;
 let testUser;
 
 beforeAll(async () => {
-  // Clean up any existing test user
+
   await sequelize.models.User.destroy({
     where: { email: 'test@example.com' },
   });
 
-  // Create test user - password will be hashed by beforeCreate hook
   testUser = await sequelize.models.User.create({
     email: 'test@example.com',
-    password: 'password123', // Plain password - hook will hash it
+    password: 'password123',
     name: 'Test User',
   });
 
-  // Generate access token
   access_token = signToken({
     id: testUser.id,
     email: testUser.email,
@@ -29,7 +27,7 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  // Clean up test data
+
   await sequelize.models.User.destroy({
     where: { email: 'test@example.com' },
   });

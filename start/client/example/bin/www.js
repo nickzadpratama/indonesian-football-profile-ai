@@ -13,8 +13,6 @@ const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 
-// Socket.io (live candle) harus di-init di HTTP server yang sama.
-// Tanpa ini, endpoint /socket.io/ 404 dan chart tidak dapat update live.
 initSocket(server);
 
 server.listen(port, async () => {

@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import FormField from "../components/FormField.jsx";
 import { Loader, ErrorPanel } from "../components/Status.jsx";
+import LoadingIndicator from "../components/LoadingIndicator.jsx";
 import { API_BASE_URL, authHeaders } from "../api/auth.js";
 import { toastifyError, toastifySuccess } from "../utils/toastify.js";
 import { useDispatch } from "react-redux";
@@ -10,10 +11,6 @@ import { membershipUpdated } from "../features/membership/membershipSlice.js";
 import useSessionToken from "../auth/useSessionToken.js";
 import { getToken } from "../auth/session.js";
 
-/**
- * Update the current user's personal team details using the external team ID.
- * Shared FanClub metadata is never edited by this form.
- */
 export default function UpdatePage() {
   const { teamId } = useParams();
   const navigate = useNavigate();
@@ -29,7 +26,7 @@ export default function UpdatePage() {
   });
   const [teamName, setTeamName] = useState("");
   const [error, setError] = useState("");
-  const [phase, setPhase] = useState("loading"); // 'loading' | 'ok' | 'error'
+  const [phase, setPhase] = useState("loading");
   const [saving, setSaving] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
 
@@ -207,9 +204,15 @@ export default function UpdatePage() {
               <button
                 type="submit"
                 disabled={saving}
+                aria-busy={saving}
                 className="w-full rounded-lg bg-emerald-500/20 py-2.5 text-sm font-black text-emerald-300 ring-1 ring-emerald-400/40 transition hover:bg-emerald-500/30 disabled:opacity-60"
               >
-                {saving ? "Saving…" : "Save changes →"}
+                {saving ? (
+                  <span className="inline-flex items-center justify-center gap-2">
+                    <LoadingIndicator label="Saving…" className="h-8 w-8" />
+                    Saving…
+                  </span>
+                ) : "Save changes →"}
               </button>
             </form>
           )}

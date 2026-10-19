@@ -4,11 +4,6 @@ import { isTokenValid } from "../auth/session.js";
 import useSessionToken from "../auth/useSessionToken.js";
 import ChatBotWidget from "../components/ChatBotWidget.jsx";
 
-/**
- * Layout untuk halaman yang butuh login. Token wajib ada & belum
- * kedaluwarsa — kalau tidak, token dibersihkan lalu user dikirim ke /login
- * (tanpa ini, token basi bikin app stuck di halaman yang selalu 401).
- */
 export default function BaseLayout() {
   const token = useSessionToken();
   if (!isTokenValid(token)) {
@@ -17,7 +12,7 @@ export default function BaseLayout() {
   return (
     <>
       <div className="dark min-h-screen bg-[#07070c] text-slate-100">
-        {/* Ambient glow backdrop */}
+
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 overflow-hidden"
@@ -28,7 +23,6 @@ export default function BaseLayout() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 py-8 lg:px-6">
-          {/* Top bar */}
 
           <Navbar />
           <Outlet />

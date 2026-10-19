@@ -8,11 +8,10 @@ let testUser;
 let testStock;
 
 beforeAll(async () => {
-  // Clean up
+
   await sequelize.models.User.destroy({ where: { email: 'watchlist@example.com' } });
   await sequelize.models.Stock.destroy({ where: { symbol: 'WATCH' } });
 
-  // Create test user
   testUser = await sequelize.models.User.create({
     email: 'watchlist@example.com',
     password: 'password123',
@@ -25,7 +24,6 @@ beforeAll(async () => {
     name: testUser.name,
   });
 
-  // Create test stock
   testStock = await sequelize.models.Stock.create({
     symbol: 'WATCH',
     name: 'Watchlist Test Stock',

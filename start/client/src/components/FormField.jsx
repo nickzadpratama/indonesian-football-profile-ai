@@ -1,4 +1,3 @@
-/** Shared dark-mode form input with floating label. */
 export default function FormField({ id, label, type = 'text', value, onChange, placeholder, autoComplete }) {
   return (
     <label htmlFor={id} className="flex flex-col gap-1.5">
