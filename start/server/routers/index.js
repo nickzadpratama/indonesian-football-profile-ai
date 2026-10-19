@@ -13,6 +13,7 @@ router.post("/facebook-login", AuthController.facebookLogin);
 
 router.use(authentication);
 
+router.use("/sports", require("./sports"));
 router.use("/me/fan-clubs", require("./membership"));
 
 router.use("/", teamRouter);

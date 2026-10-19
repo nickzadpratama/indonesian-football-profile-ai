@@ -32,42 +32,6 @@ export default function TeamsPage() {
   //   return toastifyError(error?.response?.data?.message);
   // }
 
-  // async function handleJoin(e, infoId) {
-  //   e.preventDefault();
-  //   try {
-  //     console.log(infoId);
-  //     const result = await fetch(
-  //       `https://v3.football.api-sports.io/teams?id=${infoId}`,
-  //       {
-  //         method: "GET",
-  //         headers: {
-  //           "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-  //         },
-  //       },
-  //     );
-
-  //     const data = await result.json();
-  //     postJoin(e, data.response);
-  //     Toastify({
-  //       text: "Success Join Clubs",
-  //       duration: 3000,
-  //       newWindow: true,
-  //       close: true,
-  //       gravity: "bottom", // `top` or `bottom`
-  //       position: "right", // `left`, `center` or `right`
-  //       stopOnFocus: true,
-  //       style: {
-  //         background: "#34D399",
-  //         color: "black",
-  //       },
-  //       onClick: function () {}, // Callback after click
-  //     }).showToast();
-  //   } catch (error) {
-  //     console.log(error?.response?.data);
-  //     toastifyError(error?.response?.data);
-  //   }
-  // }
-
   // useEffect(() => {
   //   getTeams("Indonesia")
   //     .then((list) => {

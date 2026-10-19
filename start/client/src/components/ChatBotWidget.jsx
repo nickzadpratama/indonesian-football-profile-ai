@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./ChatBotWidget.css";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAI } from "../features/gemini/geminiSlice";
+import { fetchAI, fetchFailed } from "../features/gemini/geminiSlice";
+import useSessionToken from "../auth/useSessionToken.js";
+import { isTokenValid } from "../auth/session.js";
 
 const WELCOME_MESSAGE = {
   id: "welcome",
@@ -11,6 +13,16 @@ const WELCOME_MESSAGE = {
 };
 
 export default function ChatBotWidget() {
+  const token = useSessionToken();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchFailed(""));
+  }, [dispatch, token]);
+  if (!isTokenValid(token)) return null;
+  return <AuthenticatedChatBot key={token} />;
+}
+
+function AuthenticatedChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const { loading, error } = useSelector((state) => state.gemini);
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);

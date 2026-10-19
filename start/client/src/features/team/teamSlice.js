@@ -1,75 +1,5 @@
-// import { createSlice } from "@reduxjs/toolkit";
-
-// export const teamSlice = createSlice({
-//   name: "team",
-//   initialState: {
-//     data: [],
-//     loading: false,
-//     error: {},
-//   },
-//   reducers: {
-//     fetchPending: (state) => {
-//       state.loading = true;
-//     },
-//     fetchSuccess: (state, action) => {
-//       state.data = action.payload;
-//       state.loading = false;
-//     },
-//     fetchFailed: (state, action) => {
-//       state.error = action.payload;
-//       state.loading = true;
-//     },
-//   },
-// });
-
-// export const { fetchPending, fetchSuccess, fetchFailed } = teamSlice.actions;
-
-// export const fetchTeams = () => async (dispatch) => {
-//   try {
-//     dispatch(fetchPending());
-
-//     const result = await fetch(
-//       `https://v3.football.api-sports.io/teams?country=Indonesia`,
-//       {
-//         method: "GET",
-//         headers: {
-//           "x-apisports-key": "e194d63f6878ad3c12abc5d1a31cb315", // <-- Ganti dengan API key Anda
-//         },
-//       },
-//     );
-//     const data = await result.json();
-//     dispatch(fetchSuccess(data.response));
-//   } catch (error) {
-//     dispatch(fetchFailed(error.message || error));
-//   }
-// };
-
-// export const fetchTeamPlayer = () => async (dispatch) => {
-//   try {
-//     console.log("object");
-//     dispatch(fetchPending());
-//     const result = await fetch(
-//       `https://v3.football.api-sports.io/teams?id=1571`,
-//       // `https://v3.football.api-sports.io/teams?id=${teamId}`,
-//       {
-//         method: "GET",
-//         headers: {
-//           "x-apisports-key": "e194d63f6878ad3c12abc5d1a31cb315", // <-- Ganti dengan API key Anda
-//         },
-//       },
-//     );
-
-//     const data = await result.json();
-//     dispatch(fetchSuccess(data.response));
-//   } catch (error) {
-//     console.log(error);
-//     dispatch(fetchFailed(error.message || error));
-//   }
-// };
-
-// export const teamReducer = teamSlice.reducer;
-
 import { createSlice } from "@reduxjs/toolkit";
+import { getSquad, getTeams } from "../../api/football.js";
 
 const initialState = {
   data: [],
@@ -99,49 +29,23 @@ export const teamSlice = createSlice({
   },
 });
 
-// Action creators are generated for each case reducer function
 export const { fetchPending, fetchSuccess, fetchFailed } = teamSlice.actions;
 
 export const fetchTeams = () => async (dispatch) => {
+  dispatch(fetchPending());
   try {
-    dispatch(fetchPending());
-
-    const result = await fetch(
-      `https://v3.football.api-sports.io/teams?country=Indonesia`,
-      {
-        method: "GET",
-        headers: {
-          "x-apisports-key": "e194d63f6878ad3c12abc5d1a31cb315", // <-- Ganti dengan API key Anda
-        },
-      },
-    );
-    const data = await result.json();
-    dispatch(fetchSuccess(data.response));
+    dispatch(fetchSuccess(await getTeams("Indonesia")));
   } catch (error) {
-    dispatch(fetchFailed(error.message || error));
+    dispatch(fetchFailed(error.message || String(error)));
   }
 };
 
 export const fetchTeamPlayer = (teamId) => async (dispatch) => {
+  dispatch(fetchPending());
   try {
-    console.log("object");
-    dispatch(fetchPending());
-    const result = await fetch(
-      `https://v3.football.api-sports.io/players/squads?team=${teamId}`,
-      // `https://v3.football.api-sports.io/players/squads?team=${teamId}`,
-      {
-        method: "GET",
-        headers: {
-          "x-apisports-key": "e194d63f6878ad3c12abc5d1a31cb315", // <-- Ganti dengan API key Anda
-        },
-      },
-    );
-
-    const data = await result.json();
-    dispatch(fetchSuccess(data.response));
+    dispatch(fetchSuccess([await getSquad(teamId)]));
   } catch (error) {
-    console.log(error);
-    dispatch(fetchFailed(error.message || error));
+    dispatch(fetchFailed(error.message || String(error)));
   }
 };
 

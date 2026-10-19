@@ -38,6 +38,7 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { toastifyError } from "../utils/toastify.js";
 import RunningData from "../components/RunningData.jsx";
+import { getTeamDetails } from "../api/football.js";
 
 const PAGE_STEP = 18;
 
@@ -51,7 +52,7 @@ export default function JoinClubsPage() {
 
   useEffect(() => {
     dispatch(fetchTeams());
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return (
@@ -78,18 +79,8 @@ export default function JoinClubsPage() {
   async function handleJoin(e, infoId) {
     e.preventDefault();
     try {
-      const result = await fetch(
-        `https://v3.football.api-sports.io/teams?id=${infoId}`,
-        {
-          method: "GET",
-          headers: {
-            "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-          },
-        },
-      );
-
-      const data = await result.json();
-      const joinedOk = await postJoin(e, data.response);
+      const teamDetails = await getTeamDetails(infoId);
+      const joinedOk = await postJoin(e, teamDetails);
 
       if (joinedOk) {
         setJoined((prev) => [...prev, infoId]);

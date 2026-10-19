@@ -2,6 +2,7 @@ import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
 import { isTokenValid } from "../auth/session.js";
 import useSessionToken from "../auth/useSessionToken.js";
+import ChatBotWidget from "../components/ChatBotWidget.jsx";
 
 /**
  * Layout untuk halaman yang butuh login. Token wajib ada & belum
@@ -31,6 +32,7 @@ export default function BaseLayout() {
 
           <Navbar />
           <Outlet />
+          <ChatBotWidget key={token} />
           <footer className="mt-12 border-t border-white/10 pb-8 text-center text-xs text-slate-500">
             Data: v3.football.api-sports.io · Teams · Squads · Player statistics
             · Dark mode
