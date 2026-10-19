@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 
 import TeamCard from "../components/TeamCard.jsx";
+import { Loader, ErrorPanel } from "../components/Status.jsx";
+import filterTeams from "../utils/filterTeams.js";
 import { fetchTeams } from "../features/team/teamSlice.js";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
@@ -11,7 +13,8 @@ export default function TeamsPage() {
 
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_STEP);
-  const { data } = useSelector((state) => state.team);
+  const { data, loading, error } = useSelector((state) => state.team);
+  const filteredTeams = filterTeams(data, query);
 
   const dispatch = useDispatch();
 
@@ -40,6 +43,8 @@ export default function TeamsPage() {
         </header>
 
         <form
+          role="search"
+          onSubmit={(event) => event.preventDefault()}
           className="mt-6 flex flex-col gap-2 rounded-xl bg-white/5 p-3 ring-1 ring-white/10 sm:flex-row sm:items-center"
 
         >
@@ -64,13 +69,21 @@ export default function TeamsPage() {
         </form>
 
         <>
-          {data.length === 0 ? (
+          {loading ? (
+            <div className="mt-6">
+              <Loader label="Fetching Indonesian teams…" />
+            </div>
+          ) : error ? (
+            <div className="mt-6">
+              <ErrorPanel message={error} onRetry={() => dispatch(fetchTeams())} />
+            </div>
+          ) : filteredTeams.length === 0 ? (
             <div className="rounded-2xl bg-white/5 py-12 text-center text-sm text-slate-400 ring-1 ring-white/10">
-              No teams match “{query}”.
+              {query.trim() ? `No teams match “${query.trim()}”.` : "No teams available."}
             </div>
           ) : (
             <div className="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {data.slice(0, visible).map((team) => (
+              {filteredTeams.slice(0, visible).map((team) => (
                 <TeamCard
 
                   key={team.team?.id}
@@ -81,15 +94,15 @@ export default function TeamsPage() {
             </div>
           )}
 
-          {data.length > visible && (
+          {!loading && !error && filteredTeams.length > visible && (
             <button
               type="button"
-              onClick={() => setVisible(visible + PAGE_STEP)}
+              onClick={() => setVisible((current) => current + PAGE_STEP)}
               className="mt-6 mx-auto flex items-center gap-2 rounded-xl bg-white/10 px-5 py-2.5 text-sm font-bold text-slate-200 ring-1 ring-white/20 transition hover:bg-white/20"
             >
               Show more teams
               <span aria-hidden="true" className="text-slate-400">
-                ({data.length - visible} remaining)
+                ({filteredTeams.length - visible} remaining)
               </span>
             </button>
           )}

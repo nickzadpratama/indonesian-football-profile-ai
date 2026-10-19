@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 import { toastifyError } from "../utils/toastify.js";
 import RunningData from "../components/RunningData.jsx";
 import { getTeamDetails } from "../api/football.js";
+import filterTeams from "../utils/filterTeams.js";
 
 const PAGE_STEP = 18;
 
@@ -36,12 +37,7 @@ export default function JoinClubsPage() {
     return toastifyError(error);
   }
 
-  const term = query.trim().toLowerCase();
-  const clubs = (data ?? []).filter((t) => {
-    if (!term) return true;
-    const teamName = t.team?.name?.toLowerCase() || "";
-    return teamName.includes(term);
-  });
+  const clubs = filterTeams(data, query);
 
   async function handleJoin(e, infoId) {
     e.preventDefault();
@@ -129,8 +125,9 @@ export default function JoinClubsPage() {
         <RunningData items={data} label="Clubs" />
 
         <form
+          role="search"
+          onSubmit={(event) => event.preventDefault()}
           className="mt-6 flex flex-col gap-2 rounded-xl bg-white/5 p-3 ring-1 ring-white/10 sm:flex-row sm:items-center"
-          onSubmit={(e) => e.preventDefault()}
         >
           <label
             htmlFor="club-search"
