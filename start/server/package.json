@@ -1,0 +1,42 @@
+{
+  "name": "hck-99-gc01-nickzadpratama",
+  "version": "1.0.0",
+  "description": "> Tuliskan API Docs kamu di sini",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest --detectOpenHandles --forceExit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/H8-FSJS-P2S5/hck-99-GC01-nickzadpratama.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/H8-FSJS-P2S5/hck-99-GC01-nickzadpratama/issues"
+  },
+  "homepage": "https://github.com/H8-FSJS-P2S5/hck-99-GC01-nickzadpratama#readme",
+  "dependencies": {
+    "@google/genai": "^2.22.0",
+    "@imagekit/nodejs": "^7.11.0",
+    "axios": "^1.20.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "google-auth-library": "^11.0.2",
+    "imagekit": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.2.0",
+    "pg": "^8.23.0",
+    "sequelize": "^6.37.8"
+  },
+  "devDependencies": {
+    "jest": "^30.4.2",
+    "sequelize-cli": "^6.6.5",
+    "supertest": "^7.2.2"
+  }
+}
