@@ -19,6 +19,8 @@ import BaseLayout from "./layouts/BaseLayout.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
 import MyTeamsPage from "./pages/MyTeamsPage.jsx";
 import UpdatePage from "./pages/UpdatePage.jsx";
+import ChatBotWidget from "./components/ChatBotWidget.jsx";
+import MembershipSync from "./components/MembershipSync.jsx";
 
 const seasonFromParam = (raw) => {
   const year = Number(raw);
@@ -55,6 +57,7 @@ export default function App() {
   return (
     <>
       <BrowserRouter>
+        <MembershipSync />
         <Routes>
           <Route element={<AuthLayout />}>
             <Route path="/login" element={<LoginPage />} />
@@ -71,6 +74,7 @@ export default function App() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
+        <ChatBotWidget />
       </BrowserRouter>
     </>
   );

@@ -1,7 +1,6 @@
-import ChatBotWidget from "../components/ChatBotWidget.jsx";
 import { Navigate, Outlet } from "react-router-dom";
-import Navbar from "../components/Navbar.jsx";
-import { isTokenValid, purgeInvalidToken } from "../auth/session.js";
+import { isTokenValid } from "../auth/session.js";
+import useSessionToken from "../auth/useSessionToken.js";
 
 /**
  * Layout untuk halaman /login & /register. Kalau token yang tersimpan
@@ -9,12 +8,11 @@ import { isTokenValid, purgeInvalidToken } from "../auth/session.js";
  * dibuang supaya halaman login tidak "terkunci" redirect ke /.
  */
 export default function AuthLayout() {
-  if (isTokenValid()) {
+  const token = useSessionToken();
+  if (isTokenValid(token)) {
     return <Navigate to="/" />;
   }
 
-  // Token rusak/kedaluwarsa tidak boleh menahan user di luar halaman login.
-  purgeInvalidToken();
   return (
     <>
       <div className="dark min-h-screen bg-[#07070c] text-slate-100">
@@ -29,11 +27,7 @@ export default function AuthLayout() {
         </div>
 
         <div className="mx-auto max-w-6xl px-4 py-8 lg:px-6">
-          {/* Top bar */}
-
-          <Navbar />
           <Outlet />
-          <ChatBotWidget />
           <footer className="mt-12 border-t border-white/10 pb-8 text-center text-xs text-slate-500">
             Data: v3.football.api-sports.io · Teams · Squads · Player statistics
             · Dark mode

@@ -1,73 +1,28 @@
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import Avatar from "./Avatar.jsx";
-import { toast } from "../toast.js";
-import { hasVoted, onVotesChange, toggleVote } from "../data/votes.js";
 import { Link } from "react-router-dom";
-import axios from "axios";
-import { toastifyError } from "../utils/toastify.js";
-import { API_BASE_URL, authHeaders } from "../api/auth.js";
+import MembershipButton from "./MembershipButton.jsx";
+import useSessionToken from "../auth/useSessionToken.js";
 
-/**
- * Team card for the teams list. The cover + details navigate to the squad;
- * the "Join Fanbase" button registers the club as the user's fanbase and
- * marks the card as joined (✓ My Teams badge) once it succeeds.
- */
-export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
+export default function TeamCard({ team, onUpdate }) {
   const info = team.team ?? {};
   const venue = team.venue ?? {};
   const teamId = info.id;
 
-  const [voted, setVoted] = useState();
-
-  useEffect(() => onVotesChange(() => setVoted(hasVoted(teamId))), [teamId]);
-
-  const name = info.name;
-  const code = info.code;
-  const logo = info.logo;
-  const founded = info.founded;
-
-  async function postJoin(e) {
-    try {
-      e.preventDefault();
-
-      await axios.post(
-        `${API_BASE_URL}/`,
-        {
-          name,
-          code,
-          logo,
-          founded,
-          stadium: venue.name,
-          city: venue.city,
-          capacity: venue.capacity,
-          image: venue.image,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.access_token}`,
-          },
-        },
-      );
-
-      if (!voted) toggleVote(teamId);
-      toast(`Joined ${info.name} fanbase`, "success");
-    } catch (error) {
-      console.log(error?.response?.data);
-      toastifyError(error?.response?.data?.message ?? error?.message);
-    }
-  }
+  const token = useSessionToken();
+  const joined = useSelector((state) => state.membership.session === token && Boolean(state.membership.items[teamId]));
 
   return (
     <article
       className={`group relative flex w-full flex-col overflow-hidden rounded-2xl bg-slate-900/80 ring-1 shadow-lg shadow-slate-950/40 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-900/50 ${
-        voted
+        joined
           ? "ring-emerald-400/40"
           : "ring-white/10 hover:ring-emerald-400/30"
       }`}
     >
-      {voted && (
+      {joined && (
         <span className="pointer-events-none absolute right-2.5 top-2.5 z-10 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[9px] font-black uppercase tracking-wide text-emerald-300 ring-1 ring-emerald-400/40">
-          ✓ My Teams
+          ✓ Joined Fans Club
         </span>
       )}
 
@@ -142,7 +97,7 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
         </div>
       </button>
 
-      {/* ── Footer: navigate + join fanbase ───────── */}
+      {/* ── Footer: navigate + membership ───────────────── */}
       <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-black/10 px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
           <Link to={`/team/${info.id}`}>
@@ -171,23 +126,7 @@ export default function TeamCard({ team, onUpdate, handleJoin, onClick }) {
           )}
         </div>
 
-        <button
-          type="button"
-          onClick={postJoin}
-          aria-pressed={voted}
-          aria-label={`${voted ? "Joined" : "Join"} ${info.name} fanbase`}
-          title={`${voted ? "You have joined" : "Join"} ${info.name} fanbase`}
-          className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-[11px] font-bold transition ${
-            voted
-              ? "bg-emerald-500/20 text-emerald-300 ring-1 ring-emerald-400/40"
-              : "bg-white/10 text-slate-300 ring-1 ring-white/20 hover:bg-emerald-500/15 hover:text-emerald-300"
-          }`}
-        >
-          <span aria-hidden="true" className="text-sm">
-            ★
-          </span>
-          <span>{voted ? "Joined ✓" : "Join Fanbase"}</span>
-        </button>
+        <MembershipButton teamId={teamId} name={info.name} />
       </footer>
     </article>
   );

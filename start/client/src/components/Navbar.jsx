@@ -1,29 +1,29 @@
-// import { Link, NavLink } from "react-router";
-import { useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router";
-// import TeamsPage from "./pages/TeamsPage.jsx";
-// import PlayersPage from "./pages/PlayersPage.jsx";
-// import PlayerProfilePage from "./pages/PlayerProfilePage.jsx";
-// import MyTeamsPage from "./pages/MyTeamsPage.jsx";
-// import LoginPage from "./pages/LoginPage.jsx";
-// import RegisterPage from "./pages/RegisterPage.jsx";
-// import UpdatePage from "./pages/UpdatePage.jsx";
 import { clearToken, getCurrentUser } from "../auth/session.js";
-import { toast } from "../toast.js";
+import useSessionToken from "../auth/useSessionToken.js";
+import { toastifyError } from "../utils/toastify.js";
+import MusicPlayer from "./MusicPlayer.jsx";
 
 /** Shared dark-mode form input with floating label. */
 export default function Navbar() {
   // Sesi asli dari JWT di localStorage (sebelumnya memakai store demo
   // src/auth/store.js, sehingga header tetap "Sign in" walau sudah login).
-  const [user, setUser] = useState(() => getCurrentUser());
+  const token = useSessionToken();
+  const user = getCurrentUser(token);
   const navigate = useNavigate();
   const location = useLocation();
 
   const signOut = () => {
     clearToken();
-    setUser(null);
-    toast("Signed out. See you soon!", "neutral");
+    toastifyError("Signed out. See you soon!");
     navigate("/login");
+  };
+
+  const requireLogin = (event) => {
+    if (user) return;
+
+    event.preventDefault();
+    toastifyError("Please login first!");
   };
 
   const navClass = (active) =>
@@ -42,6 +42,7 @@ export default function Navbar() {
         <div className="flex items-center gap-1.5">
           <Link
             to="/"
+            onClick={requireLogin}
             className="flex items-center gap-2 rounded-xl bg-white/5 px-3.5 py-2 text-sm font-black tracking-tight text-white ring-1 ring-white/10 transition hover:bg-white/10"
           >
             <span aria-hidden="true" className="text-base">
@@ -49,11 +50,17 @@ export default function Navbar() {
             </span>
             Football Hub
           </Link>
-          <NavLink to="/" end className={({ isActive }) => navClass(isActive)}>
+          <NavLink
+            to="/"
+            end
+            onClick={requireLogin}
+            className={({ isActive }) => navClass(isActive)}
+          >
             Teams
           </NavLink>
           <NavLink
             to="/myTeam"
+            onClick={requireLogin}
             className={({ isActive }) => navClass(isActive)}
           >
             My Teams
@@ -68,9 +75,10 @@ export default function Navbar() {
           )}
           {user ? (
             <>
+              <MusicPlayer />
               <span className="hidden items-center gap-1.5 rounded-lg bg-white/5 px-2.5 py-1.5 text-[11px] font-semibold text-slate-200 ring-1 ring-white/10 sm:flex">
                 <span aria-hidden="true">👤</span>
-                <span className="max-w-[9rem] truncate">{session.name}</span>
+                <span className="max-w-[9rem] truncate">{user.name}</span>
               </span>
               <NavLink
                 to="/update"

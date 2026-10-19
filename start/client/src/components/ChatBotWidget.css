@@ -4,7 +4,7 @@
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 9999;
+  z-index: 10000;
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -32,7 +32,7 @@
   position: fixed;
   bottom: 100px;
   right: 24px;
-  z-index: 9999;
+  z-index: 10000;
   width: 380px;
   max-width: calc(100vw - 48px);
   height: 520px;
@@ -80,6 +80,11 @@
   border-radius: 50%;
   background: #22c55e;
   animation: pulse 2s infinite;
+}
+
+.bot-status.error .bot-dot {
+  background: #fca5a5;
+  animation: none;
 }
 
 @keyframes pulse {
@@ -155,6 +160,12 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
+.bot-message.bot .bot-bubble.bot-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
 .bot-text { margin: 0; font-size: 14px; line-height: 1.5; word-wrap: break-word; }
 
 .bot-time {
@@ -203,8 +214,16 @@
   gap: 8px;
 }
 
+.bot-form {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+  min-width: 0;
+}
+
 .bot-input {
   flex: 1;
+  min-width: 0;
   padding: 10px 14px;
   border: 1px solid #e5e7eb;
   border-radius: 20px;

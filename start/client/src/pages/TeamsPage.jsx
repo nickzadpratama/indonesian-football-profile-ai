@@ -1,15 +1,9 @@
 import { useEffect, useState } from "react";
 // import { getTeams } from "../api/football.js";
 import TeamCard from "../components/TeamCard.jsx";
-import { Loader, ErrorPanel } from "../components/Status.jsx";
-import gifLoading from "../components/assets/vecteezy_loading-bar-progress-with-green-color-vector-illustration_14945926.svg";
-import Toastify from "toastify-js";
-import axios from "axios";
 import { fetchTeams } from "../features/team/teamSlice.js";
 import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
-import { toastifyError } from "../utils/toastify.js";
-import { Link } from "react-router-dom";
 
 const PAGE_STEP = 18;
 
@@ -19,7 +13,7 @@ export default function TeamsPage() {
   // const [error, setError] = useState(null);
   const [query, setQuery] = useState("");
   const [visible, setVisible] = useState(PAGE_STEP);
-  const { data, loading, error } = useSelector((state) => state.team);
+  const { data } = useSelector((state) => state.team);
   // console.log(object);
 
   const dispatch = useDispatch();
@@ -112,7 +106,7 @@ export default function TeamsPage() {
   useEffect(() => {
     // fetchPlayer();
     dispatch(fetchTeams());
-  }, []);
+  }, [dispatch]);
 
   return (
     <>
@@ -196,7 +190,7 @@ export default function TeamsPage() {
               {data.slice(0, visible).map((team) => (
                 <TeamCard
                   // key={team.team?.id}
-                  key={team.id}
+                  key={team.team?.id}
                   team={team}
                   // onClick={() => onSelect(team)}
                 />

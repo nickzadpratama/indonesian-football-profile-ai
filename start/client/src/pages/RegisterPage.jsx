@@ -74,28 +74,34 @@ export default function RegisterPage() {
             Join Football Hub — it takes a few seconds.
           </p>
 
-          <form onSubmit={handleRegister} className="mt-6 flex flex-col gap-4">
-            <input
+          <form
+            onSubmit={handleRegister}
+            className="mt-6 flex flex-col gap-4"
+          >
+            <FormField
               id="register-name"
               label="Username"
               type="text"
-              onChange={(e) => setUsername(e.target.value)}
+              value={username}
+              onChange={setUsername}
               placeholder="Your name"
               autoComplete="name"
             />
-            <input
+            <FormField
               id="register-email"
               label="Email"
               type="email"
-              onChange={(e) => setEmail(e.target.value)}
+              value={email}
+              onChange={setEmail}
               placeholder="you@example.com"
               autoComplete="email"
             />
-            <input
+            <FormField
               id="register-password"
               label="Password (min 6 chars)"
               type="password"
-              onChange={(e) => setPassword(e.target.value)}
+              value={password}
+              onChange={setPassword}
               placeholder="••••••••"
               autoComplete="new-password"
             />

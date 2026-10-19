@@ -3,20 +3,21 @@ import "./ChatBotWidget.css";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchAI } from "../features/gemini/geminiSlice";
 
+const WELCOME_MESSAGE = {
+  id: "welcome",
+  text: "Halo! Saya assistant virtual sepak bola Indonesia. Ada yang bisa saya bantu?",
+  sender: "bot",
+  timestamp: new Date(),
+};
+
 export default function ChatBotWidget() {
   const [isOpen, setIsOpen] = useState(false);
-  const { loading } = useSelector((state) => state.gemini);
-  const [messages, setMessages] = useState([
-    {
-      id: Date.now(),
-      text: "Halo! Saya assistant virtual. Ada yang bisa saya bantu?",
-      sender: "bot",
-      timestamp: new Date(),
-    },
-  ]);
+  const { loading, error } = useSelector((state) => state.gemini);
+  const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [inputValue, setInputValue] = useState("");
   const isProcessing = loading;
   const messagesEndRef = useRef(null);
+  const nextMessageId = useRef(1);
   const dispatch = useDispatch();
 
   const scrollToBottom = useCallback(() => {
@@ -26,11 +27,11 @@ export default function ChatBotWidget() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!inputValue.trim() || isProcessing) return;
-    const userText = inputValue;
+    const userText = inputValue.trim();
     setMessages((prev) => [
       ...prev,
       {
-        id: Date.now(),
+        id: `user-${nextMessageId.current++}`,
         text: userText,
         sender: "user",
         timestamp: new Date(),
@@ -38,15 +39,16 @@ export default function ChatBotWidget() {
     ]);
     setInputValue("");
 
-    const reply = await dispatch(fetchAI(userText));
+    const result = await dispatch(fetchAI(userText));
 
     setMessages((prev) => [
       ...prev,
       {
-        id: Date.now(),
-        text: typeof reply === "string" ? reply : getBotReply(userText),
+        id: `bot-${nextMessageId.current++}`,
+        text: result.message,
         sender: "bot",
         timestamp: new Date(),
+        isError: !result.ok,
       },
     ]);
   };
@@ -55,32 +57,17 @@ export default function ChatBotWidget() {
     scrollToBottom();
   }, [messages, scrollToBottom]);
 
-  const getBotReply = (msg) => {
-    const lower = msg.toLowerCase().trim();
-    if (lower.includes("halo") || lower.includes("hi") || lower.includes("hey"))
-      return "Hai! Selamat datang! Apa yang bisa saya bantu hari ini?";
-    if (lower.includes("nama") || lower.includes("siapa"))
-      return "Saya assistant virtual yang siap membantu Anda!";
-    if (lower.includes("bantu") || lower.includes("tolong"))
-      return "Tentu! Silakan jelaskan apa yang ingin Anda tanya.";
-    if (lower.includes("terima kasih"))
-      return "Sama-sama! Senang bisa membantu Anda. 😊";
-    if (lower.includes("jam"))
-      return `Sekarang jam ${new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" })}.`;
-    if (lower.includes("tanggal"))
-      return `Hari ini tanggal ${new Date().toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}.`;
-    const fallbacks = [
-      "Menarik! Bisa dijelaskan lebih detail?",
-      "Baik, saya catat. Ada lagi yang bisa saya bantu?",
-      "Saya mengerti. Mohon maaf jika saya tidak bisa menjawab secara spesifik.",
-      "Terima kasih atas pertanyaannya! Ada hal lain?",
-      "Baiklah, silakan lanjutkan...",
-    ];
-    return fallbacks[Math.floor(Math.random() * fallbacks.length)];
-  };
-
   const formatTime = (d) =>
-    d.toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+    d.toLocaleTimeString("id-ID", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+  const resetMessages = () => {
+    nextMessageId.current = 1;
+    setMessages([{ ...WELCOME_MESSAGE, timestamp: new Date() }]);
+    setInputValue("");
+  };
 
   return (
     <>
@@ -124,26 +111,18 @@ export default function ChatBotWidget() {
           <div className="bot-header">
             <div>
               <span className="bot-title">Assistant</span>
-              <span className="bot-status">
+              <span className={`bot-status${error ? " error" : ""}`}>
                 <span className="bot-dot" />
-                Online
+                {error ? "Tidak tersedia" : isProcessing ? "Menjawab..." : "Online"}
               </span>
             </div>
             <div className="bot-actions">
               <button
                 type="button"
                 className="bot-action-btn"
-                onClick={() =>
-                  setMessages([
-                    {
-                      id: Date.now(),
-                      text: "Halo! Saya assistant virtual. Ada yang bisa saya bantu?",
-                      sender: "bot",
-                      timestamp: new Date(),
-                    },
-                  ])
-                }
+                onClick={resetMessages}
                 title="Reset"
+                aria-label="Reset percakapan"
               >
                 <svg
                   width="18"
@@ -182,7 +161,7 @@ export default function ChatBotWidget() {
             </div>
           </div>
           <div className="bot-body">
-            <div className="bot-messages">
+            <div className="bot-messages" aria-live="polite">
               {messages.map((m) => (
                 <div
                   key={m.id}
@@ -190,7 +169,7 @@ export default function ChatBotWidget() {
                     "bot-message " + (m.sender === "user" ? "user" : "bot")
                   }
                 >
-                  <div className="bot-bubble">
+                  <div className={`bot-bubble${m.isError ? " bot-error" : ""}`}>
                     <p className="bot-text">{m.text}</p>
                     <span className="bot-time">{formatTime(m.timestamp)}</span>
                   </div>
@@ -211,21 +190,19 @@ export default function ChatBotWidget() {
             </div>
           </div>
           <div className="bot-footer">
-            <form onSubmit={(e) => handleSubmit(e)}>
+            <form className="bot-form" onSubmit={handleSubmit}>
               <input
                 type="text"
                 className="bot-input text-black"
                 placeholder="Ketik pesan..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                // onKeyDown={handleKeyDown}
                 disabled={isProcessing}
                 maxLength={500}
               />
               <button
                 type="submit"
                 className="bot-send"
-                // onClick={handleSend}
                 disabled={!inputValue.trim() || isProcessing}
                 aria-label="Kirim"
               >

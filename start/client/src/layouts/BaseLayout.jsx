@@ -1,7 +1,7 @@
-import ChatBotWidget from "../components/ChatBotWidget.jsx";
 import { Navigate, Outlet } from "react-router-dom";
 import Navbar from "../components/Navbar.jsx";
-import { isTokenValid, purgeInvalidToken } from "../auth/session.js";
+import { isTokenValid } from "../auth/session.js";
+import useSessionToken from "../auth/useSessionToken.js";
 
 /**
  * Layout untuk halaman yang butuh login. Token wajib ada & belum
@@ -9,8 +9,8 @@ import { isTokenValid, purgeInvalidToken } from "../auth/session.js";
  * (tanpa ini, token basi bikin app stuck di halaman yang selalu 401).
  */
 export default function BaseLayout() {
-  if (!isTokenValid()) {
-    purgeInvalidToken();
+  const token = useSessionToken();
+  if (!isTokenValid(token)) {
     return <Navigate to="/login" replace />;
   }
   return (
@@ -31,7 +31,6 @@ export default function BaseLayout() {
 
           <Navbar />
           <Outlet />
-          <ChatBotWidget />
           <footer className="mt-12 border-t border-white/10 pb-8 text-center text-xs text-slate-500">
             Data: v3.football.api-sports.io · Teams · Squads · Player statistics
             · Dark mode

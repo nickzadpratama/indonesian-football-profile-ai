@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import FormField from "./FormField.jsx";
-import { toast } from "../toast.js";
+import { toastifyError as toast } from "../utils/toastify.js";
 
 /**
  * Modal dialog to update one team's value fields. The team entry is

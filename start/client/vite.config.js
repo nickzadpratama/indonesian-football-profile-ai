@@ -9,5 +9,12 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 // (Enforce HTTPS Facebook), jadi popup Facebook Login butuh dev https ini.
 export default defineConfig({
   plugins: [react(), tailwindcss(), basicSsl()],
+  server: {
+    proxy: {
+      "/genAI": {
+        target: "http://localhost:3000",
+        changeOrigin: true,
+      },
+    },
+  },
 });
-

@@ -3,7 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 import FormField from "../components/FormField.jsx";
 import { Loader, ErrorPanel } from "../components/Status.jsx";
-import { toast } from "../toast.js";
+import { API_BASE_URL, authHeaders } from "../api/auth.js";
+import { toastifyError, toastifySuccess } from "../utils/toastify.js";
 
 /**
  * Update a joined team (name / code / founded / stadium / city / capacity)
@@ -32,10 +33,8 @@ export default function UpdatePage() {
     let cancelled = false;
 
     axios
-      .get(`http://football.nickz.online/${teamId}`, {
-        headers: {
-          Authorization: `Bearer ${localStorage.access_token}`,
-        },
+      .get(`${API_BASE_URL}/${teamId}`, {
+        headers: authHeaders(),
       })
       .then(({ data }) => {
         if (cancelled) return;
@@ -56,7 +55,7 @@ export default function UpdatePage() {
         const message = err?.response?.data?.message ?? err?.message;
         setError(message);
         setPhase("error");
-        toast(message, "error");
+        toastifyError(message);
       });
 
     return () => {
@@ -73,22 +72,16 @@ export default function UpdatePage() {
     setSaving(true);
     setError("");
     try {
-      const { data } = await axios.put(
-        `http://football.nickz.online/${teamId}`,
-        form,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.access_token}`,
-          },
-        },
-      );
-      toast(data?.message ?? "Team updated successfully ✓", "success");
+      const { data } = await axios.put(`${API_BASE_URL}/${teamId}`, form, {
+        headers: authHeaders(),
+      });
+      toastifySuccess(data?.message ?? "Team updated successfully ✓");
       navigate("/myTeam");
     } catch (err) {
       const message =
         err?.response?.data?.message ?? err?.message ?? "Failed to update team";
       setError(message);
-      toast(message, "error");
+      toastifyError(message);
     } finally {
       setSaving(false);
     }

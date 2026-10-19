@@ -5,6 +5,13 @@
 // sudah kedaluwarsa dibersihkan supaya user tidak "terkunci" dari halaman
 // login ataupun terjebak di halaman yang selalu 401.
 const TOKEN_KEY = "access_token";
+const AUTH_CHANGE_EVENT = "football-hub:auth-change";
+
+function notifyAuthChange() {
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(AUTH_CHANGE_EVENT));
+  }
+}
 
 /** Raw access_token ("" kalau belum login / storage tidak tersedia). */
 export function getToken() {
@@ -21,6 +28,7 @@ export function saveToken(token) {
   try {
     if (typeof localStorage === "undefined" || !token) return;
     localStorage.setItem(TOKEN_KEY, token);
+    notifyAuthChange();
   } catch {
     /* storage unavailable */
   }
@@ -31,9 +39,41 @@ export function clearToken() {
   try {
     if (typeof localStorage === "undefined") return;
     localStorage.removeItem(TOKEN_KEY);
+    notifyAuthChange();
   } catch {
     /* ignore */
   }
+}
+
+export function subscribeToAuthChanges(callback) {
+  if (typeof window === "undefined") return () => {};
+
+  let expiryTimer;
+  const sync = () => {
+    clearTimeout(expiryTimer);
+    callback();
+    const token = getToken();
+    if (token && !isTokenValid(token)) {
+      purgeInvalidToken();
+      return;
+    }
+    const exp = decodeToken(token)?.exp;
+    if (token && typeof exp === "number" && Number.isFinite(exp)) {
+      const remaining = exp * 1000 - Date.now();
+      expiryTimer = setTimeout(sync, Math.min(Math.max(remaining, 0), 2147483647));
+    }
+  };
+  const onStorage = (event) => {
+    if (event.key === TOKEN_KEY || event.key === null) sync();
+  };
+  window.addEventListener(AUTH_CHANGE_EVENT, sync);
+  window.addEventListener("storage", onStorage);
+  sync();
+  return () => {
+    clearTimeout(expiryTimer);
+    window.removeEventListener(AUTH_CHANGE_EVENT, sync);
+    window.removeEventListener("storage", onStorage);
+  };
 }
 
 /** Decode payload JWT (tanpa verifikasi tanda tangan — itu tugas server). */
@@ -57,9 +97,9 @@ export function isTokenValid(token = getToken()) {
 }
 
 /** User yang sedang login dari payload token → { id, email, name } | null. */
-export function getCurrentUser() {
-  const payload = decodeToken();
-  if (!payload || !isTokenValid()) return null;
+export function getCurrentUser(token = getToken()) {
+  const payload = decodeToken(token);
+  if (!payload || !isTokenValid(token)) return null;
   const email = payload.email ?? "";
   return {
     id: payload.id,
