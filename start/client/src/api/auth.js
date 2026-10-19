@@ -6,14 +6,13 @@
 // MEMBLOKIR request http:// dari halaman https (mixed content), dan itulah
 // penyebab login/register selalu gagal walau servernya hidup.
 //
-// Default: https://football.nickz.online (sertifikatnya valid, jadi aman
-// dipanggil dari halaman http maupun https). Bisa dioverride lewat
-// VITE_API_URL — lihat .env.example.
+// Development uses the same-origin Vite /api proxy. Production defaults to
+// HTTPS; VITE_API_URL can override either environment (see .env.example).
 import axios from "axios";
 import { getToken } from "../auth/session.js";
 
 export const API_BASE_URL = (
-  import.meta.env.VITE_API_URL ?? "https://football.nickz.online"
+  import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "/api" : "https://football.nickz.online")
 ).replace(/\/+$/, "");
 
 /** Header Authorization untuk endpoint yang butuh login. */

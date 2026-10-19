@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import useSessionToken from "../auth/useSessionToken.js";
 import { isTokenValid } from "../auth/session.js";
 import { changeMembership, fetchMemberships } from "../features/membership/membershipSlice.js";
@@ -44,6 +44,11 @@ export default function MembershipButton({ teamId, name, allowLeave = false }) {
           : state.phase === "error" ? "Retry membership check"
             : joined ? (allowLeave ? "Leave Fans Club" : "Joined ✓") : "Join Fans Club"}
       </button>
+      {joined && !allowLeave && (
+        <Link to="/myTeam" className="text-xs font-semibold text-emerald-300 underline underline-offset-2">
+          View My Teams →
+        </Link>
+      )}
       {error && <p role="alert" className="max-w-64 text-xs text-rose-300">{error} Membership may have changed; retry or refresh to verify.</p>}
       {state.phase === "error" && <p role="alert" className="max-w-64 text-xs text-rose-300">{state.error}</p>}
     </div>

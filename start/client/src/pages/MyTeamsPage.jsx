@@ -11,7 +11,7 @@ export default function MyTeamsPage() {
   const token = useSessionToken();
   const { items, phase: storedPhase, error, session } = useSelector((state) => state.membership);
   const phase = session !== token || storedPhase === "idle" ? "loading" : storedPhase;
-  const myTeams = session === token ? Object.values(items).map((item) => item.FanClub) : [];
+  const myTeams = session === token ? Object.values(items).map((item) => ({ ...item.FanClub, ...item.details })) : [];
   const reload = () => dispatch(fetchMemberships(token));
 
   return (

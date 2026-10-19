@@ -1,0 +1,8 @@
+{
+  "chat.tools.terminal.autoApprove": {
+    "/^git check-ignore -v start/client/\\.env start/client/node_modules start/client/dist 2>/dev/null \\|\\| true; git -C start/server status --short --untracked-files=all$/": {
+      "approve": true,
+      "matchCommandLine": true
+    }
+  }
+}

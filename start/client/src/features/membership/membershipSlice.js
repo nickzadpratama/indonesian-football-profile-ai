@@ -40,6 +40,11 @@ const slice = createSlice({
   name: "membership",
   initialState,
   reducers: {
+    membershipUpdated: (state, { payload }) => {
+      if (state.session !== payload.token) return;
+      state.items[payload.membership.FanClub.externalTeamId] = payload.membership;
+      state.revision++;
+    },
     setMembershipSession: (state, { payload }) => {
       if (state.session !== payload) return { ...initialState, session: payload };
     },
@@ -89,5 +94,5 @@ const slice = createSlice({
   },
 });
 
-export const { setMembershipSession } = slice.actions;
+export const { setMembershipSession, membershipUpdated } = slice.actions;
 export default slice.reducer;

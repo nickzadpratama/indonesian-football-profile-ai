@@ -5,16 +5,20 @@ import FormField from "../components/FormField.jsx";
 import { Loader, ErrorPanel } from "../components/Status.jsx";
 import { API_BASE_URL, authHeaders } from "../api/auth.js";
 import { toastifyError, toastifySuccess } from "../utils/toastify.js";
+import { useDispatch } from "react-redux";
+import { membershipUpdated } from "../features/membership/membershipSlice.js";
+import useSessionToken from "../auth/useSessionToken.js";
+import { getToken } from "../auth/session.js";
 
 /**
- * Update a joined team (name / code / founded / stadium / city / capacity)
- * via the server's PUT /:id endpoint. Reached from the "✎ Update" button
- * on a MyTeamCard in My Teams. Current values are loaded first so the form
- * always starts from the saved data.
+ * Update the current user's personal team details using the external team ID.
+ * Shared FanClub metadata is never edited by this form.
  */
 export default function UpdatePage() {
   const { teamId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const token = useSessionToken();
   const [form, setForm] = useState({
     name: "",
     code: "",
@@ -33,12 +37,13 @@ export default function UpdatePage() {
     let cancelled = false;
 
     axios
-      .get(`${API_BASE_URL}/${teamId}`, {
+      .get(`${API_BASE_URL}/me/fan-clubs/${teamId}`, {
         headers: authHeaders(),
       })
       .then(({ data }) => {
         if (cancelled) return;
-        const team = data.data ?? {};
+        const membership = data.data;
+        const team = { ...membership.FanClub, ...membership.details };
         setTeamName(team.name ?? "");
         setForm({
           name: team.name ?? "",
@@ -61,7 +66,7 @@ export default function UpdatePage() {
     return () => {
       cancelled = true;
     };
-  }, [teamId, reloadKey]);
+  }, [teamId, reloadKey, token]);
 
   const setField = (key) => (value) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -72,9 +77,11 @@ export default function UpdatePage() {
     setSaving(true);
     setError("");
     try {
-      const { data } = await axios.put(`${API_BASE_URL}/${teamId}`, form, {
+      const { data } = await axios.patch(`${API_BASE_URL}/me/fan-clubs/${teamId}`, form, {
         headers: authHeaders(),
       });
+      if (getToken() !== token) return;
+      dispatch(membershipUpdated({ token, membership: data.data }));
       toastifySuccess(data?.message ?? "Team updated successfully ✓");
       navigate("/myTeam");
     } catch (err) {
@@ -118,6 +125,9 @@ export default function UpdatePage() {
             ) : (
               "Edit your joined team details."
             )}
+          </p>
+          <p className="mt-2 text-center text-xs text-slate-400">
+            Changes apply only to your My Teams details, not the shared club or other members.
           </p>
 
           {phase === "loading" && (

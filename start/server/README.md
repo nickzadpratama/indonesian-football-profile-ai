@@ -252,3 +252,18 @@ explicitly verified disposable test database, serially. Before production, also
 test migration up/down and concurrent duplicate joins on PostgreSQL; mocked HTTP
 tests cannot prove database locking/constraint behavior. Test that ten simultaneous
 joins yield one membership and that two users can join the same club independently.
+
+### Personal My Teams updates
+
+Apply `20261019100000-add-membership-details.js` before deploying this version.
+The My Teams Update button uses the API-Sports external team ID, not a legacy
+Team row ID. `GET /me/fan-clubs/:externalTeamId` returns the current user's
+membership. `PATCH` on that URL accepts name, code, founded, stadium, city,
+and capacity and stores them in the membership's `details` JSONB column.
+The name must have 2–255 characters; optional year is an integer 1800–2100;
+optional capacity is a non-negative 32-bit integer. Empty numeric fields become
+null. Ownership always comes from the verified token. A non-member gets 404.
+These are personal overrides: shared FanClub metadata and other users' details
+are never changed. Leave removes these overrides along with the membership.
+`node scripts/check-membership-flow.js` checks persistence and isolation with
+temporary users, then cleans up those users and their memberships.

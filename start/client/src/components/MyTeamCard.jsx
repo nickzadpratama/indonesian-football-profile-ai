@@ -112,6 +112,13 @@ export default function MyTeamCard({ team }) {
             </div>
           </Link>
           <MembershipButton teamId={team.externalTeamId} name={team.name} allowLeave />
+          <Link
+            to={`/myTeam/update/${team.externalTeamId}`}
+            aria-label={`Update ${team.name}`}
+            className="rounded-lg bg-violet-500/15 px-2.5 py-1.5 text-[11px] font-bold text-violet-300 ring-1 ring-violet-400/30 hover:bg-violet-500/25"
+          >
+            ✎ Update
+          </Link>
         </div>
       </footer>
     </article>
