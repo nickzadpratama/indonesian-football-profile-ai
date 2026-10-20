@@ -1,9 +1,9 @@
 import axios from "axios";
 import { getToken } from "../auth/session.js";
 
-export const API_BASE_URL = (
-  import.meta.env.VITE_API_URL ?? (import.meta.env.DEV ? "/api" : "https://football.nickz.online")
-).replace(/\/+$/, "");
+export const API_BASE_URL =
+  (import.meta.env.VITE_API_URL ?? "").trim().replace(/\/+$/, "") ||
+  "https://football.nickz.online";
 
 export function authHeaders() {
   const token = getToken();

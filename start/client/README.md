@@ -1,5 +1,43 @@
 # React + Vite
 
+## Backend API URL
+
+Development and production now call `https://football.nickz.online` directly.
+Auth, sports, membership, chatbot, and the standalone Google/Join Clubs demo
+share `API_BASE_URL`. No local Vite API proxy is required; local HTTPS stays enabled.
+
+Set `VITE_API_URL=https://football.nickz.online` in your ignored local `.env`
+and in Vercel Preview/Production. Remove any stale `/api` override. Restart
+the development server after env changes; rebuild/redeploy for Vercel changes.
+An absent, empty, whitespace-only, or slash-only value uses the production
+default. Surrounding whitespace and trailing slashes are removed from overrides.
+Endpoint paths are appended without an extra `/api` prefix.
+
+For intentional local-backend development, explicitly set
+`VITE_API_URL=http://localhost:3000` (or a suitable HTTPS backend). All services,
+including chatbot, use that override directly. An HTTPS frontend cannot safely
+call an HTTP backend in browsers that block mixed content: use HTTPS on the
+local backend rather than disabling browser security. Relative `/api` is no
+longer a supported local proxy setup.
+
+Run `npm run test:api-url` to test URL resolution in development/production and
+mocked auth, sports, membership, and chatbot request contracts. This test loads
+real modules through Vite without env files and mocks Axios/fetch; it sends no
+requests to production and needs no new dependency. The Facebook browser smoke
+tests remain local by design.
+
+Before release, manually verify the actual backend deployment's CORS/preflight
+for your frontend origin and headers `Authorization`, `token`, and `Content-Type`.
+The repository backend uses `cors()`, but deployed configuration is unverified.
+Do not use `no-cors`, change OAuth redirect domains, or change backend/database/
+PM2 settings just to switch the API URL. Test writes and paid chatbot requests
+only with explicit approval and designated test data/accounts.
+
+Deploy Preview first, check browser Network destinations and auth regression,
+then approve Production. Changing the API URL does not change the frontend host
+or Google/Facebook redirect origin. To roll back, restore the relevant source
+and env settings together, rebuild, or restore the last verified deployment.
+
 ## Facebook Login migration
 
 Facebook Login uses `@greatsumini/react-facebook-login` (lockfile: 3.4.0).

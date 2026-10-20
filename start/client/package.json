@@ -8,6 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "test:facebook": "node scripts/facebook-login-smoke.mjs",
+    "test:api-url": "node scripts/api-url.test.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

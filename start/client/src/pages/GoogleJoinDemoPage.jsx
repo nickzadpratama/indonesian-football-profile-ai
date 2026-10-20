@@ -4,6 +4,7 @@ import Toastify from "toastify-js";
 import axios from "axios";
 import JoinClubsPage from "./JoinClubsPage.jsx";
 import { toastifyError } from "../utils/toastify.js";
+import { API_BASE_URL } from "../api/auth.js";
 
 export default function GoogleJoinDemoPage() {
   const [accessToken, setAccessToken] = useState(localStorage.access_token);
@@ -12,7 +13,7 @@ export default function GoogleJoinDemoPage() {
     try {
       const { data } = await axios.post(
 
-        "http://localhost:3000/google-login",
+        `${API_BASE_URL}/google-login`,
         {},
         {
           headers: {

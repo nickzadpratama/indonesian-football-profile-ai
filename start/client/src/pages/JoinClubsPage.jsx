@@ -9,6 +9,7 @@ import { toastifyError } from "../utils/toastify.js";
 import RunningData from "../components/RunningData.jsx";
 import { getTeamDetails } from "../api/football.js";
 import filterTeams from "../utils/filterTeams.js";
+import { API_BASE_URL } from "../api/auth.js";
 
 const PAGE_STEP = 18;
 
@@ -77,7 +78,7 @@ export default function JoinClubsPage() {
 
       await axios.post(
 
-        "http://localhost:3000/",
+        `${API_BASE_URL}/`,
         {
           name: info.name,
           code: info.code,

@@ -5,17 +5,4 @@ import basicSsl from "@vitejs/plugin-basic-ssl";
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), basicSsl()],
-  server: {
-    proxy: {
-      "/api": {
-        target: "http://localhost:3000",
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api(?=\/|$)/, ""),
-      },
-      "/genAI": {
-        target: "http://localhost:3000",
-        changeOrigin: true,
-      },
-    },
-  },
 });

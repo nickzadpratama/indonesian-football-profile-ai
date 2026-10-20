@@ -3,12 +3,6 @@ import axios from "axios";
 import { API_BASE_URL } from "../../api/auth.js";
 import { clearToken, getToken, isTokenValid } from "../../auth/session.js";
 
-const GEMINI_API_BASE_URL =
-  import.meta.env.DEV &&
-  /^http:\/\/(localhost|127\.0\.0\.1):3000\/?$/.test(API_BASE_URL)
-    ? ""
-    : API_BASE_URL;
-
 const initialState = {
   data: "",
   loading: false,
@@ -56,7 +50,7 @@ export const fetchAI = (input) => async (dispatch) => {
   try {
     dispatch(fetchPending());
 
-    const result = await axios.get(`${GEMINI_API_BASE_URL}/genAI`, {
+    const result = await axios.get(`${API_BASE_URL}/genAI`, {
       params: { input: trimmedInput },
       headers: { Authorization: `Bearer ${token}` },
       timeout: 60000,
