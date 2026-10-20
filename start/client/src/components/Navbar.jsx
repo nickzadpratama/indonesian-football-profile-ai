@@ -5,7 +5,6 @@ import { toastifyError } from "../utils/toastify.js";
 import MusicPlayer from "./MusicPlayer.jsx";
 
 export default function Navbar() {
-
   const token = useSessionToken();
   const user = getCurrentUser(token);
   const navigate = useNavigate();
@@ -78,13 +77,6 @@ export default function Navbar() {
                 <span aria-hidden="true">👤</span>
                 <span className="max-w-[9rem] truncate">{user.name}</span>
               </span>
-              <NavLink
-                to="/update"
-                className={({ isActive }) => navClass(isActive)}
-                title="Edit your profile"
-              >
-                ✎ Edit
-              </NavLink>
               <button
                 type="button"
                 onClick={signOut}
