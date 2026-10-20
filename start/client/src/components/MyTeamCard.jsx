@@ -21,10 +21,9 @@ export default function MyTeamCard({ team }) {
         </span>
       )}
 
-      {/* ── Clickable cover + details ─────────────── */}
       <button
         type="button"
-        // onClick={onClick}
+
         className="block w-full text-left"
       >
         <div className="relative h-32 overflow-hidden">
@@ -94,7 +93,6 @@ export default function MyTeamCard({ team }) {
         </div>
       </button>
 
-      {/* ── Footer: navigate + update ─────────────── */}
       <footer className="mt-auto flex flex-wrap items-center justify-between gap-2 border-t border-white/10 bg-black/10 px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-1.5">
           <Link to={`/team/${team.externalTeamId}`}>

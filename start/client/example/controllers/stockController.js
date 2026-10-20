@@ -59,10 +59,6 @@ class StockController {
         throw { name: 'NotFound', message: 'Stock not found.' };
       }
 
-      // Enrichment: kalau fundamental masih NULL di DB, ambil dari Finnhub
-      // (sekalian di-update ke DB sebagai cache) tanpa bikin endpoint gagal.
-      // Crypto tidak punya fundamental saham (market cap/P/E dari metric Finnhub
-      // tidak berlaku), jadi skip enrichment untuk simbol crypto.
       if (
         !isCrypto(stock.symbol) &&
         stock.market_cap == null &&
@@ -121,8 +117,6 @@ class StockController {
       const { symbol } = req.params;
       const { interval = '1day', range = '1m' } = req.query;
 
-      // interval intraday dari client (5m/15m/30m/1h/4h/1d/1w/1M) dipakai
-      // sebagai override ke Twelve Data; kalau tidak dikenal, fallback ke range
       const VALID_INTERVALS = ['5m', '15m', '30m', '1h', '4h', '1d', '1w', '1M'];
       const intervalOverride = VALID_INTERVALS.includes(interval) ? interval : null;
 
@@ -131,7 +125,6 @@ class StockController {
         throw { name: 'NotFound', message: 'Stock not found.' };
       }
 
-      // Hitung tanggal berdasarkan range
       const now = new Date();
       let startDate = new Date();
 
@@ -165,10 +158,9 @@ class StockController {
         order: [['datetime', 'ASC']],
       });
 
-      // Jika data di database kurang dari yang diminta, fetch dari API
       if (candles.length === 0) {
         try {
-          // Twelve Data memakai format berbeda untuk crypto: "BTC/USD" bukan "BTC"
+
           const tdSymbol = isCrypto(stock.symbol)
             ? `${stock.symbol.toUpperCase()}/USD`
             : symbol.toUpperCase();
@@ -195,7 +187,6 @@ class StockController {
               ignoreDuplicates: true,
             });
 
-            // Ambil lagi dari database dengan filter tanggal
             candles = await Candle.findAll({
               where: {
                 stock_id: stock.id,
@@ -251,7 +242,6 @@ class StockController {
           const today = new Date().toISOString().split('T')[0];
           const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
-          // Crypto tidak didukung /company-news -> pakai berita crypto umum
           const finnhubNews = isCrypto(stock.symbol)
             ? await finnhubService.getCryptoNews(weekAgo, today)
             : await finnhubService.getCompanyNews(stock.symbol.toUpperCase(), weekAgo, today);
@@ -316,7 +306,6 @@ class StockController {
       const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const needsRefresh = !insight || insight.generated_at < oneDayAgo;
 
-      //Insight dianggap kedaluwarsa kalau belum pernah dibuat, atau umurnya sudah lebih dari 24 jam.
       if (needsRefresh) {
         try {
           const quote = await Quote.findOne({ where: { stock_id: stock.id } });

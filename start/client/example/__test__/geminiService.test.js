@@ -1,4 +1,3 @@
-// Nama variabel harus diawali "mock" agar boleh direferensikan dari factory jest.mock.
 const mockGenerateContent = jest.fn();
 
 jest.mock('@google/genai', () => ({
@@ -14,7 +13,7 @@ describe('geminiService', () => {
     jest.resetModules();
     process.env.GEMINI_API_KEY = env.key !== undefined ? env.key : 'test-api-key';
     process.env.GEMINI_MODEL = env.model !== undefined ? env.model : 'gemini-test-model';
-    // eslint-disable-next-line global-require
+
     return require('../services/geminiService');
   };
 
@@ -90,7 +89,6 @@ describe('geminiService', () => {
     expect(mockGenerateContent).toHaveBeenCalledTimes(2);
     expect(mockGenerateContent.mock.calls[1][0].model).toBe('gemini-3.6-flash');
 
-    // Panggilan berikutnya memakai kandidat yang sudah aktif (activeModel)
     await geminiService.generateInsight({ symbol: 'MSFT' });
     expect(mockGenerateContent).toHaveBeenCalledTimes(3);
     expect(mockGenerateContent.mock.calls[2][0].model).toBe('gemini-3.6-flash');
@@ -108,7 +106,7 @@ describe('geminiService', () => {
 
   test('throws immediately when error message is falsy (empty string)', async () => {
     const err = new Error('');
-    // Force message to be an empty string to cover the `||` falsy branch
+
     err.message = '';
     mockGenerateContent.mockRejectedValue(err);
     geminiService = loadService();
@@ -126,7 +124,7 @@ describe('geminiService', () => {
     await expect(geminiService.generateInsight({ symbol: 'AAPL' })).rejects.toThrow(
       'Failed to generate AI insight: 404 not found',
     );
-    // 1 kandidat dari GEMINI_MODEL + 3 kandidat default
+
     expect(mockGenerateContent).toHaveBeenCalledTimes(4);
   });
 

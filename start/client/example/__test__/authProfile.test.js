@@ -7,12 +7,11 @@ let access_token;
 let testUser;
 
 beforeAll(async () => {
-  // Clean up
+
   await sequelize.models.User.destroy({
     where: { email: 'profiletest@example.com' },
   });
 
-  // Create test user
   testUser = await sequelize.models.User.create({
     email: 'profiletest@example.com',
     password: 'password123',

@@ -78,14 +78,13 @@ describe('Error Handler Middleware', () => {
     });
 
     it('should return 400 for unique constraint error', async () => {
-      // Create a user first
+
       await sequelize.models.User.create({
         email: 'unique@test.com',
         password: 'password123',
         name: 'Test'
       });
 
-      // Try to create duplicate
       const res = await request(app)
         .post('/api/auth/register')
         .send({
@@ -97,7 +96,6 @@ describe('Error Handler Middleware', () => {
       expect(res.status).toBe(400);
       expect(res.body).toHaveProperty('message');
 
-      // Cleanup
       await sequelize.models.User.destroy({ where: { email: 'unique@test.com' } });
     });
   });
@@ -106,7 +104,7 @@ describe('Error Handler Middleware', () => {
     it('should return 400 with custom message', async () => {
       const res = await request(app)
         .post('/api/auth/register')
-        .send({}); // Missing required fields
+        .send({});
 
       expect(res.status).toBe(400);
       expect(res.body.message).toBeDefined();
@@ -168,7 +166,6 @@ describe('Error Handler Middleware', () => {
         .post('/api/auth/google')
         .send({ id_token: 'invalid' });
 
-      // Should return 401 for invalid token
       expect(res.status).toBe(401);
     });
   });

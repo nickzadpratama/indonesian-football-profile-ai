@@ -26,8 +26,8 @@ describe('MarketController - Unit Tests (mocked models)', () => {
       Stock: { id: 10, symbol: 'AAPL', name: 'Apple Inc.', sector: 'Technology' },
     };
     Quote.findAll
-      .mockResolvedValueOnce([quote])  // gainers
-      .mockResolvedValueOnce([]);       // losers
+      .mockResolvedValueOnce([quote])
+      .mockResolvedValueOnce([]);
 
     const res = mockRes();
     await MarketController.getMovers({}, res, jest.fn());
@@ -51,8 +51,8 @@ describe('MarketController - Unit Tests (mocked models)', () => {
       Stock: null,
     };
     Quote.findAll
-      .mockResolvedValueOnce([])      // gainers
-      .mockResolvedValueOnce([quote]); // losers
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([quote]);
 
     const res = mockRes();
     await MarketController.getMovers({}, res, jest.fn());

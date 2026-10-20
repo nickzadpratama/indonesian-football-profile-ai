@@ -1,8 +1,5 @@
 'use strict';
 
-// Seeder tambahan untuk aset crypto (kategori di luar 11 sektor GICS).
-// Idempotent: hanya insert simbol yang belum ada, jadi aman dijalankan ulang
-// dan tidak konflik dengan seeder 55 saham S&P 500 yang sudah jalan.
 const { STOCKS } = require('../constants/stocks');
 
 module.exports = {
@@ -25,8 +22,8 @@ module.exports = {
             name: stock.name,
             sector: stock.sector,
             exchange: 'BINANCE',
-            country: 'GLB', // crypto tidak terikat negara (kolom VARCHAR(5))
-            regulator: 'NONE', // tidak diawasi SEC
+            country: 'GLB',
+            regulator: 'NONE',
             updated_at: new Date(),
             created_at: new Date(),
           },

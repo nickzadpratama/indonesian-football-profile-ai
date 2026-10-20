@@ -1,4 +1,3 @@
-// Lightweight localStorage-backed auth store (demo only — no real backend).
 const USERS_KEY = "football_hub_users";
 const SESSION_KEY = "football_hub_session";
 const AUTH_EVENT = "football-hub-auth";
@@ -18,7 +17,7 @@ function write(key, value) {
     if (typeof localStorage === "undefined") return;
     localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* storage unavailable */
+    return;
   }
 }
 
@@ -27,7 +26,7 @@ function dispatchAuth() {
     if (typeof window !== "undefined")
       window.dispatchEvent(new Event(AUTH_EVENT));
   } catch {
-    /* ignore */
+    return;
   }
 }
 
@@ -48,7 +47,6 @@ function getUsers() {
   return read(USERS_KEY, []);
 }
 
-/** Create a new account → auto sign-in. Returns { ok, error?, user? }. */
 export function register({ name, email, password, confirmPassword }) {
   name = (name ?? "").trim();
   email = (email ?? "").trim();
@@ -74,7 +72,6 @@ export function register({ name, email, password, confirmPassword }) {
   return { ok: true, user: { name, email } };
 }
 
-/** Sign in with email + password. Returns { ok, error?, user? }. */
 export function login({ email, password }) {
   email = (email ?? "").trim();
   const user = getUsers().find(
@@ -86,21 +83,16 @@ export function login({ email, password }) {
   return { ok: true, user: { name: user.name, email: user.email } };
 }
 
-/** Clear the current session. */
 export function logout() {
   try {
     if (typeof localStorage !== "undefined")
       localStorage.removeItem(SESSION_KEY);
   } catch {
-    /* ignore */
+    return;
   }
   dispatchAuth();
 }
 
-/**
- * Edit the signed-in profile. Requires the current password to confirm.
- * Returns { ok, error?, user? }.
- */
 export function updateUser({
   currentPassword,
   name,

@@ -1,9 +1,5 @@
 const request = require('supertest');
 
-// Mock dotenv so env injection is fully controllable: the real .env always
-// sets CLIENT_ORIGIN, which would otherwise make the falsy branch of
-// `CLIENT_ORIGIN || 'http://localhost:5173'` (and the dotenv skip branch)
-// unreachable from tests.
 jest.mock('dotenv', () => ({ config: jest.fn() }));
 
 describe('app.js', () => {
@@ -22,8 +18,7 @@ describe('app.js', () => {
 
   describe('dotenv loading', () => {
     it('should call dotenv.config when NODE_ENV is not production', () => {
-      // Re-require dotenv AFTER resetModules so we observe the same mock
-      // instance that the freshly loaded app.js will use.
+
       const mockDotenv = require('dotenv');
       mockDotenv.config.mockClear();
 
@@ -37,9 +32,6 @@ describe('app.js', () => {
       const mockDotenv = require('dotenv');
       mockDotenv.config.mockClear();
 
-      // config/config.json's production entry uses the mysql dialect whose
-      // driver (mysql2) is not installed, so stub ../models to let the app
-      // load purely to exercise the NODE_ENV branch.
       jest.doMock('../models', () => ({
         sequelize: {},
         Sequelize: jest.fn(),

@@ -8,11 +8,10 @@ let testUser;
 let testStock;
 
 beforeAll(async () => {
-  // Clean up
+
   await sequelize.models.User.destroy({ where: { email: 'stockdetail@example.com' } });
   await sequelize.models.Stock.destroy({ where: { symbol: 'DETAIL' } });
 
-  // Create test user
   testUser = await sequelize.models.User.create({
     email: 'stockdetail@example.com',
     password: 'password123',
@@ -25,7 +24,6 @@ beforeAll(async () => {
     name: testUser.name,
   });
 
-  // Create test stock
   testStock = await sequelize.models.Stock.create({
     symbol: 'DETAIL',
     name: 'Detail Test Stock',
@@ -44,7 +42,6 @@ beforeAll(async () => {
     previous_close: 98.00,
   });
 
-  // Create test news
   await sequelize.models.News.create({
     stock_id: testStock.id,
     headline: 'Test News Headline',
@@ -54,7 +51,6 @@ beforeAll(async () => {
     published_at: new Date(),
   });
 
-  // Create test AI insight
   await sequelize.models.AiInsight.create({
     stock_id: testStock.id,
     content: {

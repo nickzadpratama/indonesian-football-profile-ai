@@ -5,10 +5,9 @@ const { sequelize } = require('../models');
 let testStock1, testStock2;
 
 beforeAll(async () => {
-  // Clean up
+
   await sequelize.models.Stock.destroy({ where: { symbol: { [require('sequelize').Op.in]: ['MKT1', 'MKT2'] } } });
 
-  // Create test stocks with quotes
   testStock1 = await sequelize.models.Stock.create({
     symbol: 'MKT1',
     name: 'Market Test Stock 1',

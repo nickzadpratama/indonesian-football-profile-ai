@@ -14,7 +14,7 @@ const updateQuotesJob = async () => {
   for (let i = 0; i < stocks.length; i++) {
     const stock = stocks[i];
     try {
-      // Crypto (mis. BTC) tidak ada di Finnhub /quote REST -> pakai Twelve Data /quote
+
       const quoteData = isCrypto(stock.symbol)
         ? await twelveDataService.getCryptoQuote(stock.symbol)
         : await finnhubService.getQuote(stock.symbol);
@@ -49,7 +49,7 @@ const updateCandlesJob = async () => {
   for (let i = 0; i < stocks.length; i++) {
     const stock = stocks[i];
     try {
-      // Crypto butuh format "BTC/USD" di Twelve Data
+
       const tsSymbol = isCrypto(stock.symbol) ? `${stock.symbol}/USD` : stock.symbol;
       const candles = await twelveDataService.getTimeSeries(tsSymbol, '1m');
 
@@ -88,7 +88,7 @@ const updateNewsJob = async () => {
   for (let i = 0; i < stocks.length; i++) {
     const stock = stocks[i];
     try {
-      // Crypto tidak didukung endpoint /company-news -> pakai berita crypto umum
+
       const newsData = isCrypto(stock.symbol)
         ? await finnhubService.getCryptoNews(weekAgo, today)
         : await finnhubService.getCompanyNews(stock.symbol, weekAgo, today);
@@ -140,10 +140,10 @@ const cleanupCandlesJob = async () => {
 };
 
 const startCronJobs = () => {
-  cron.schedule('*/4 * * * *', updateQuotesJob); // tiap 4 menit
-  cron.schedule('0 21 * * *', updateCandlesJob); // tiap hari jam 21:00
-  cron.schedule('0 */4 * * *', updateNewsJob); // tiap 4 jam, di menit ke-0 (00:00, 04:00, 08:00, 12:00, 16:00, 20:00)
-  cron.schedule('0 2 * * *', cleanupCandlesJob); // tiap hari jam 02:00
+  cron.schedule('*/4 * * * *', updateQuotesJob);
+  cron.schedule('0 21 * * *', updateCandlesJob);
+  cron.schedule('0 */4 * * *', updateNewsJob);
+  cron.schedule('0 2 * * *', cleanupCandlesJob);
 
   console.log('[Cron] All cron jobs scheduled.');
 };

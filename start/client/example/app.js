@@ -16,7 +16,6 @@ app.use(
   }),
 );
 
-// Fix for Google Sign-In popup and COOP issues
 app.use((req, res, next) => {
   res.setHeader('Cross-Origin-Opener-Policy', 'unsafe-none');
   res.setHeader('Cross-Origin-Embedder-Policy', 'unsafe-none');
@@ -29,9 +28,6 @@ app.set('query parser', 'extended');
 
 app.use('/api', router);
 
-// Error handling middleware — registered last so errors thrown by any
-// middleware or route above propagate here instead of Express's default
-// HTML handler. Exported for unit testing.
 function errorHandler(err, req, res, next) {
   console.error('Server error:', err);
   res.status(err.status || 500).json({

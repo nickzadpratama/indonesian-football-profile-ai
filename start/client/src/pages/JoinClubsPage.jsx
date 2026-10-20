@@ -1,36 +1,5 @@
-/**
- * ============================================================================
- * JoinClubsPage — halaman "Join Clubs" + fungsi postJoin  (FILE BARU)
- * ============================================================================
- * FILE BARU — tidak ada satu baris pun dari source code aplikasi yang diubah
- * atau dimodifikasi (kode lama dibiarkan utuh 100%).
- *
- * Gaya penulisan sengaja dibuat mirip TeamsPage.jsx:
- *   - Data clubs lewat Redux: useSelector + dispatch(fetchTeams())
- *   - Search + pagination "Show more" dengan PAGE_STEP = 18 seperti TeamsPage
- *   - Loading memakai gif seperti di TeamsPage/PlayersPage
- *   - Toastify "Success Join Clubs" sama persis dengan kode komentar TeamsPage
- *   - postJoin memakai axios POST + Bearer token seperti postJoin di TeamCard
- *   - Di bagian atas halaman ada <RunningData /> (tampilan data berjalan)
- *
- * Alur join (mirip alur kode komentar handleJoin di TeamsPage.jsx):
- *   handleJoin(e, infoId) -> fetch klub by id dari api-sports
- *                         -> postJoin(e, data.response) (axios POST ke server)
- *                         -> Toastify "Success Join Clubs"
- *
- * Cara mencoba TANPA mengubah file apa pun:
- *   1. cd start/client && npm run dev
- *   2. Buka http://localhost:5173/google-login.html (login Google dulu)
- *
- * Jika ingin dipasang di aplikasi utama (tambahkan sendiri, App.jsx tidak
- * saya ubah):
- *   import JoinClubsPage from "./pages/JoinClubsPage.jsx";
- *   <Route path="/join" element={<JoinClubsPage />} />
- * ============================================================================
- */
-
 import { useEffect, useState } from "react";
-import gifLoading from "../components/assets/vecteezy_loading-bar-progress-with-green-color-vector-illustration_14945926.svg";
+import LoadingIndicator from "../components/LoadingIndicator.jsx";
 import Toastify from "toastify-js";
 import axios from "axios";
 import { fetchTeams } from "../features/team/teamSlice.js";
@@ -38,6 +7,9 @@ import { useDispatch } from "react-redux";
 import { useSelector } from "react-redux";
 import { toastifyError } from "../utils/toastify.js";
 import RunningData from "../components/RunningData.jsx";
+import { getTeamDetails } from "../api/football.js";
+import filterTeams from "../utils/filterTeams.js";
+import { API_BASE_URL } from "../api/auth.js";
 
 const PAGE_STEP = 18;
 
@@ -51,12 +23,12 @@ export default function JoinClubsPage() {
 
   useEffect(() => {
     dispatch(fetchTeams());
-  }, []);
+  }, [dispatch]);
 
   if (loading) {
     return (
       <div className="flex justify-center mt-28">
-        <img src={gifLoading} className="w-1/5" />
+        <LoadingIndicator label="Loading clubs…" className="w-1/5 min-w-24 max-w-48" />
       </div>
     );
   }
@@ -66,30 +38,13 @@ export default function JoinClubsPage() {
     return toastifyError(error);
   }
 
-  // Search sederhana (mirip kode komentar di TeamsPage.jsx)
-  const term = query.trim().toLowerCase();
-  const clubs = (data ?? []).filter((t) => {
-    if (!term) return true;
-    const teamName = t.team?.name?.toLowerCase() || "";
-    return teamName.includes(term);
-  });
+  const clubs = filterTeams(data, query);
 
-  /** Join klub: fetch detail by id, lalu lanjut ke postJoin (alur TeamsPage). */
   async function handleJoin(e, infoId) {
     e.preventDefault();
     try {
-      const result = await fetch(
-        `https://v3.football.api-sports.io/teams?id=${infoId}`,
-        {
-          method: "GET",
-          headers: {
-            "x-apisports-key": "51a6f63d7c6835b341a49be3985f148c", // <-- Ganti dengan API key Anda
-          },
-        },
-      );
-
-      const data = await result.json();
-      const joinedOk = await postJoin(e, data.response);
+      const teamDetails = await getTeamDetails(infoId);
+      const joinedOk = await postJoin(e, teamDetails);
 
       if (joinedOk) {
         setJoined((prev) => [...prev, infoId]);
@@ -98,14 +53,14 @@ export default function JoinClubsPage() {
           duration: 3000,
           newWindow: true,
           close: true,
-          gravity: "bottom", // `top` or `bottom`
-          position: "right", // `left`, `center` or `right`
+          gravity: "bottom",
+          position: "right",
           stopOnFocus: true,
           style: {
             background: "#34D399",
             color: "black",
           },
-          onClick: function () {}, // Callback after click
+          onClick: function () {},
         }).showToast();
       }
     } catch (error) {
@@ -114,13 +69,6 @@ export default function JoinClubsPage() {
     }
   }
 
-  /**
-   * postJoin — kirim data klub ke server untuk dibuatkan Team baru.
-   * Bentuknya sama seperti postJoin di TeamCard.jsx (axios POST + Bearer),
-   * field stadium/city diambil dari venue sesuai bentuk data api-sports agar
-   * sesuai kolom wajib model Team (name, code, founded, stadium, city,
-   * capacity tidak boleh kosong). Return true kalau sukses, false kalau gagal.
-   */
   async function postJoin(e, response) {
     try {
       e.preventDefault();
@@ -129,8 +77,8 @@ export default function JoinClubsPage() {
       const venue = response?.[0]?.venue ?? {};
 
       await axios.post(
-        // `https://football.nickz.online/`,
-        "http://localhost:3000/",
+
+        `${API_BASE_URL}/`,
         {
           name: info.name,
           code: info.code,
@@ -159,7 +107,7 @@ export default function JoinClubsPage() {
   return (
     <>
       <section className="pt-2">
-        {/* Heading */}
+
         <header className="text-center">
           <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 text-2xl shadow-lg shadow-emerald-500/20 ring-2 ring-white/20">
             🤝
@@ -175,13 +123,12 @@ export default function JoinClubsPage() {
           </p>
         </header>
 
-        {/* Tampilan data berjalan */}
         <RunningData items={data} label="Clubs" />
 
-        {/* Search */}
         <form
+          role="search"
+          onSubmit={(event) => event.preventDefault()}
           className="mt-6 flex flex-col gap-2 rounded-xl bg-white/5 p-3 ring-1 ring-white/10 sm:flex-row sm:items-center"
-          onSubmit={(e) => e.preventDefault()}
         >
           <label
             htmlFor="club-search"
@@ -205,7 +152,6 @@ export default function JoinClubsPage() {
           </span>
         </form>
 
-        {/* Content */}
         {clubs.length === 0 ? (
           <div className="rounded-2xl bg-white/5 py-12 text-center text-sm text-slate-400 ring-1 ring-white/10">
             No clubs match “{query}”.
@@ -225,7 +171,6 @@ export default function JoinClubsPage() {
                     </span>
                   )}
 
-                  {/* Cover */}
                   <div className="relative h-32 overflow-hidden">
                     {club.venue?.image ? (
                       <img
@@ -252,7 +197,6 @@ export default function JoinClubsPage() {
                     </span>
                   </div>
 
-                  {/* Details */}
                   <div className="flex flex-col gap-2.5 px-4 py-3">
                     <h3 className="truncate text-sm font-black tracking-tight text-white">
                       {club.team?.name}
@@ -285,7 +229,6 @@ export default function JoinClubsPage() {
                     </div>
                   </div>
 
-                  {/* Footer: tombol Join -> postJoin */}
                   <footer className="mt-auto border-t border-white/10 bg-black/10 px-3 py-2.5">
                     <button
                       type="button"
@@ -308,7 +251,6 @@ export default function JoinClubsPage() {
           </div>
         )}
 
-        {/* Show more (persis seperti TeamsPage) */}
         {clubs.length > visible && (
           <button
             type="button"

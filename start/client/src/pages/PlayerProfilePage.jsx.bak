@@ -67,7 +67,7 @@ export default function PlayerProfilePage({
   const info = team?.team ?? {};
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState(null);
-  const [phase, setPhase] = useState("loading"); // 'loading' | 'ok' | 'error'
+  const [phase, setPhase] = useState("loading");
   const [reloadKey, setReloadKey] = useState(0);
   const [seasonYear, setSeasonYear] = useState(
     season ?? SEASON_YEARS.find((y) => y !== PREMIUM_ONLY_YEAR),
@@ -109,7 +109,7 @@ export default function PlayerProfilePage({
 
   return (
     <section className="pt-2">
-      {/* ── Header / profile card ─────────────────── */}
+
       <div className="relative overflow-hidden rounded-2xl bg-slate-900/80 ring-1 ring-white/10 shadow-lg shadow-slate-950/40">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-cyan-500/10" />
 
@@ -168,7 +168,6 @@ export default function PlayerProfilePage({
           </div>
         </div>
 
-        {/* Personal details */}
         <div className="relative grid grid-cols-2 gap-x-6 border-t border-white/10 px-5 pt-3 pb-4 sm:grid-cols-3">
           <InfoRow
             label="Nationality"
@@ -189,14 +188,12 @@ export default function PlayerProfilePage({
         </div>
       </div>
 
-      {/* ── Season scroller ───────────────────────── */}
       <SeasonScroller
         value={seasonYear}
         onChange={changeSeason}
         note="scroll — updates stats"
       />
 
-      {/* ── Statistics ───────────────────────────── */}
       {phase === "loading" && (
         <div className="mt-6">
           <Loader label="Loading statistics…" />
@@ -221,7 +218,7 @@ export default function PlayerProfilePage({
                   key={stat.league?.id}
                   className="rounded-2xl bg-slate-900/80 ring-1 ring-white/10"
                 >
-                  {/* League header */}
+
                   <header className="flex flex-wrap items-center gap-3 px-5 py-3.5">
                     <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
                       {stat.league?.logo ? (
@@ -256,7 +253,6 @@ export default function PlayerProfilePage({
                     )}
                   </header>
 
-                  {/* Stat tiles */}
                   <div className="flex flex-col gap-4 px-5 py-4">
                     <StatGroup
                       title="Season overview"

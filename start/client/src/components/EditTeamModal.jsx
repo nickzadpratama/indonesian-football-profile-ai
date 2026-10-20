@@ -2,11 +2,6 @@ import { useEffect, useState } from "react";
 import FormField from "./FormField.jsx";
 import { toastifyError as toast } from "../utils/toastify.js";
 
-/**
- * Modal dialog to update one team's value fields. The team entry is
- * populated into the form; onSave receives cleaned { name, code, founded,
- * city, stadium, capacity }. Closes via backdrop click or Escape.
- */
 export default function EditTeamModal({ team, onSave, onClose }) {
   const info = team.team ?? {};
   const venue = team.venue ?? {};
@@ -72,14 +67,13 @@ export default function EditTeamModal({ team, onSave, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+
       <div
         aria-hidden="true"
         onClick={onClose}
         className="absolute inset-0 bg-black/60 backdrop-blur-sm"
       />
 
-      {/* Dialog */}
       <div
         role="dialog"
         aria-modal="true"

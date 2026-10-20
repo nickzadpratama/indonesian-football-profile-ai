@@ -3,27 +3,25 @@ const app = require('../app');
 
 describe('Error Handler Middleware - All Cases', () => {
   it('should handle SequelizeDatabaseError', async () => {
-    // Trigger a database error by sending invalid data
+
     const res = await request(app)
       .post('/api/auth/register')
-      .send({ 
-        email: 'test@test.com', 
-        password: 'password123', 
+      .send({
+        email: 'test@test.com',
+        password: 'password123',
         name: 'Test',
         invalid_field: 'value'
       });
 
-    // Should not crash the server
     expect(res.status).toBeLessThanOrEqual(500);
   });
 
   it('should handle ServiceUnavailable errors', async () => {
-    // This tests the 503 error handler
+
     const res = await request(app)
       .post('/api/auth/google')
       .send({ id_token: 'test' });
 
-    // Should return 401 for invalid token, not 500
     expect(res.status).toBe(401);
   });
 

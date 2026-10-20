@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none">
+  <defs>
+    <linearGradient id="ball" x1="63" y1="54" x2="177" y2="183" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff"/>
+      <stop offset="1" stop-color="#cbd5e1"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="35" y1="59" x2="205" y2="183" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#34d399"/>
+      <stop offset="1" stop-color="#06b6d4"/>
+    </linearGradient>
+    <filter id="shadow" x="35" y="40" width="170" height="170" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+  <ellipse cx="120" cy="190" rx="58" ry="13" fill="#020617" opacity=".35" filter="url(#shadow)"/>
+  <path d="M44 151a79 79 0 0 1 133-70" stroke="#1e293b" stroke-width="8" stroke-linecap="round" opacity=".7"/>
+  <path d="M177 81a79 79 0 0 1 19 69" stroke="url(#accent)" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="196" cy="150" r="7" fill="#34d399"/>
+  <g>
+    <animateTransform attributeName="transform" type="rotate" from="0 120 120" to="360 120 120" dur="2.4s" repeatCount="indefinite"/>
+    <circle cx="120" cy="120" r="61" fill="url(#ball)" stroke="#e2e8f0" stroke-width="2"/>
+    <g fill="#0f172a">
+      <path d="m120 84 21 15-8 25h-26l-8-25 21-15Z"/>
+      <path d="m120 59 23 9-2 18-21-15-21 15-2-18 23-9Z"/>
+      <path d="m170 91 7 24-15 12-20-3 8-25 20-8Z"/>
+      <path d="m165 151 12 18-18 19-17-12 4-22 19-3Z"/>
+      <path d="m75 91-7 24 15 12 20-3-8-25-20-8Z"/>
+      <path d="m75 151-12 18 18 19 17-12-4-22-19-3Z"/>
+      <path d="m120 160 13-36h-26l13 36Z"/>
+      <path d="m120 160 17 16-8 12h-18l-8-12 17-16Z"/>
+    </g>
+    <path d="M120 59c-31 0-57 24-61 55m122 0c-4-31-30-55-61-55M68 115c-2 21 5 41 19 56m66 0c14-15 21-35 19-56M87 171c20 13 46 13 66 0" stroke="#94a3b8" stroke-width="2" opacity=".55"/>
+  </g>
+  <text x="120" y="224" fill="#94a3b8" font-family="Arial, sans-serif" font-size="12" font-weight="700" letter-spacing="3" text-anchor="middle">LOADING</text>
+</svg>

@@ -1,15 +1,3 @@
-/* ============================================================================
- * RunningData.css — CSS untuk tampilan data berjalan (running text / marquee)
- * ============================================================================
- * FILE BARU — tidak mengubah file CSS lain di aplikasi.
- *
- * Cara kerja animasi:
- *   - .running-data-track berisi data yang diduplikasi 2x (lihat RunningData.jsx)
- *   - Track digeser ke kiri sebanyak -50% (tepat 1 salinan data) lalu ulang
- *     tanpa terputus -> efek data berjalan mulus (seamless loop)
- *   - Saat kursor di atas komponen, animasi berhenti (pause) supaya bisa dibaca
- * ==========================================================================*/
-
 @keyframes running-data-scroll {
   from {
     transform: translateX(0);
@@ -26,12 +14,10 @@
   will-change: transform;
 }
 
-/* Data berhenti bergerak saat di-hover biar enak dibaca */
 .running-data:hover .running-data-track {
   animation-play-state: paused;
 }
 
-/* Hormati preferensi pengguna yang mematikan animasi */
 @media (prefers-reduced-motion: reduce) {
   .running-data-track {
     animation: none;

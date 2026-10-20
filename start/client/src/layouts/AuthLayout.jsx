@@ -2,11 +2,6 @@ import { Navigate, Outlet } from "react-router-dom";
 import { isTokenValid } from "../auth/session.js";
 import useSessionToken from "../auth/useSessionToken.js";
 
-/**
- * Layout untuk halaman /login & /register. Kalau token yang tersimpan
- * masih valid, user diarahkan ke beranda; token yang sudah kedaluwarsa
- * dibuang supaya halaman login tidak "terkunci" redirect ke /.
- */
 export default function AuthLayout() {
   const token = useSessionToken();
   if (isTokenValid(token)) {
@@ -16,7 +11,7 @@ export default function AuthLayout() {
   return (
     <>
       <div className="dark min-h-screen bg-[#07070c] text-slate-100">
-        {/* Ambient glow backdrop */}
+
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 overflow-hidden"

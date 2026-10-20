@@ -11,7 +11,7 @@ import {
 import TeamsPage from "./pages/TeamsPage.jsx";
 import PlayersPage from "./pages/PlayersPage.jsx";
 import PlayerProfilePage from "./pages/PlayerProfilePage.jsx";
-// import MyTeamsPage from "./pages/MyTeamsPage.jsx";
+
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 
@@ -19,15 +19,12 @@ import BaseLayout from "./layouts/BaseLayout.jsx";
 import AuthLayout from "./layouts/AuthLayout.jsx";
 import MyTeamsPage from "./pages/MyTeamsPage.jsx";
 import UpdatePage from "./pages/UpdatePage.jsx";
-import ChatBotWidget from "./components/ChatBotWidget.jsx";
 import MembershipSync from "./components/MembershipSync.jsx";
 
 const seasonFromParam = (raw) => {
   const year = Number(raw);
   return Number.isInteger(year) && year > 0 ? year : undefined;
 };
-
-/** /teams/:teamId — squad page. Deep links resolve the team entry from the cached API list. */
 
 function ProfileRoute() {
   const { playerId } = useParams();
@@ -66,7 +63,6 @@ export default function App() {
           <Route element={<BaseLayout />}>
             <Route path="/" element={<TeamsPage />} />
 
-            {/* <Route path="/:teamId" element={<SquadRoute />} /> */}
             <Route path="/team/:teamId" element={<PlayersPage />} />
             <Route path="/myTeam" element={<MyTeamsPage />} />
             <Route path="/myTeam/update/:teamId" element={<UpdatePage />} />
@@ -74,7 +70,6 @@ export default function App() {
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <ChatBotWidget />
       </BrowserRouter>
     </>
   );

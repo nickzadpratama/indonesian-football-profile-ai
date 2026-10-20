@@ -8,7 +8,6 @@ import { PREMIUM_ONLY_YEAR, SEASON_YEARS } from "../data/seasons.js";
 import { Loader, ErrorPanel } from "../components/Status.jsx";
 import { fetchPlayerStatistic } from "../features/player/playerSlice.js";
 
-/* ── Position badge colour mapping ── */
 const positionStyles = {
   Goalkeeper: "bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/30",
   Defender: "bg-sky-400/15 text-sky-300 ring-1 ring-sky-400/30",
@@ -19,14 +18,9 @@ const positionStyles = {
 const DEFAULT_POSITION =
   "bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/30";
 
-/** Render a value or an em-dash placeholder when missing. */
 const fmt = (value) =>
   value === null || value === undefined ? "—" : String(value);
 
-/**
- * A two-column label / value row used in the personal-details section.
- * @param={{ label: string, value: * }} props
- */
 function InfoRow({ label, value }) {
   return (
     <div className="flex items-center justify-between gap-3 py-1.5">
@@ -40,10 +34,6 @@ function InfoRow({ label, value }) {
   );
 }
 
-/**
- * A single numeric stat tile.
- * @param={{ value: *, label: string, highlight?: boolean }} props
- */
 function StatTile({ value, label, highlight = false }) {
   return (
     <div className="flex flex-col items-center rounded-xl bg-slate-950/50 px-2 py-2.5 ring-1 ring-white/5">
@@ -59,10 +49,6 @@ function StatTile({ value, label, highlight = false }) {
   );
 }
 
-/**
- * A labelled 4-column grid of `StatTile`s.
- * @param={{ title: string, tiles: React.ReactNode }} props
- */
 function StatGroup({ title, tiles }) {
   return (
     <div>
@@ -74,36 +60,6 @@ function StatGroup({ title, tiles }) {
   );
 }
 
-/**
- * Player profile & statistics page.
- *
- * Data sources (see ../features/player/playerSlice.js):
- *  1. **playerSlice.js** (Redux) — `fetchPlayerStatistic(playerId, season)`
- *     hits `/players?id=ID&season=YEAR` and stores the response entries
- *     `[{ player, statistics[] }]` in `state.player.data`.  Each
- *     statistics entry describes one competition (league) the player
- *     featured in that season.
- *
- * The two sources are merged: the slice supplies player identity while
- * `fetchPlayerStatistic` supplies the per-season statistics that are
- * rendered below.  If the slice ever carries `statistics[]` entries
- * (future-proof), those take priority over the API response.
- *
- * Statistics rendering follows the `example` folder conventions
- * (JSDoc, defensive defaults, explicit error/empty states): a season
- * totals strip (appearances / goals / assists / minutes / average
- * rating) plus per-competition cards, each split into grouped tiles —
- * season overview, goals & shooting, passing & duels, defence &
- * dribbles, discipline and substitutes.
- *
- * @param={{
- *   player:  { id: number, name?: string, position?: string, [k:string]: any }
- *   team:    { team?: { name?: string } } | null
- *   onBack:  () => void
- *   season:  number | undefined
- *   onSelectSeason: (year: number) => void
- * }} props
- */
 export default function PlayerProfilePage({
   player,
   team,
@@ -124,7 +80,6 @@ export default function PlayerProfilePage({
     season ?? SEASON_YEARS.find((y) => y !== PREMIUM_ONLY_YEAR),
   );
 
-  /* ── 2. playerSlice.js ─ load per-season statistics into Redux ── */
   useEffect(() => {
     if (player.id && seasonYear)
       dispatch(fetchPlayerStatistic(player.id, seasonYear));
@@ -139,12 +94,6 @@ export default function PlayerProfilePage({
     onSelectSeason?.(year);
   };
 
-  /* ── Merge data sources ───────────────────────────── */
-  /* playerSlice.js — state.player.data is an array of squad
-     entries ({ team, players[] }) and / or statistic entries
-     ({ player, statistics[] }).  We look up the squad entry that
-     contains this player to recover identity data that may be
-     richer than the shallow `player` prop received via routing. */
   const squadList = Array.isArray(sliceData) ? sliceData : [];
   const squadEntry = squadList.find((entry) =>
     (entry.players ?? []).some((member) => member.id === player.id),
@@ -153,8 +102,6 @@ export default function PlayerProfilePage({
     (member) => member.id === player.id,
   );
 
-  /* Statistic entries from `fetchPlayerStatistic` live in the same
-     state.player.data array — pick the one matching this player. */
   const statEntry = squadList.find(
     (entry) => entry.player?.id != null && entry.player.id === player.id,
   );
@@ -162,7 +109,6 @@ export default function PlayerProfilePage({
     squadList.find((entry) => (entry.statistics?.length ?? 0) > 0)
       ?.statistics ?? [];
 
-  /* Player identity: statistic payload → squad info → routing props. */
   const playerInfo = { ...squadPlayer, ...player };
   const detail = statEntry?.player ?? playerInfo;
   const statsSeason = statEntry?.statistics?.[0]?.league?.season;
@@ -171,12 +117,9 @@ export default function PlayerProfilePage({
       ? sliceStatistics
       : (statEntry?.statistics ?? []);
 
-  /* Slice keeps `loading === true` after fetchFailed — error wins. */
   const statsError =
     typeof sliceError === "string" ? sliceError : (sliceError?.message ?? null);
 
-  // Total gabungan dari semua kompetisi yang tampil pada musim ini.
-  // Rating dikumpulkan terpisah agar bisa dirata-rata (bukan dijumlah).
   const totals = statistics.reduce(
     (acc, stat) => {
       const rating = Number(stat.games?.rating);
@@ -204,7 +147,7 @@ export default function PlayerProfilePage({
 
   return (
     <section className="pt-2">
-      {/* ── Header / profile card ─────────────────── */}
+
       <div className="relative overflow-hidden rounded-2xl bg-slate-900/80 ring-1 ring-white/10 shadow-lg shadow-slate-950/40">
         <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 via-transparent to-cyan-500/10" />
 
@@ -263,7 +206,6 @@ export default function PlayerProfilePage({
           </div>
         </div>
 
-        {/* Personal details */}
         <div className="relative grid grid-cols-2 gap-x-6 border-t border-white/10 px-5 pt-3 pb-4 sm:grid-cols-3">
           <InfoRow
             label="Nationality"
@@ -284,14 +226,12 @@ export default function PlayerProfilePage({
         </div>
       </div>
 
-      {/* ── Season scroller ───────────────────────── */}
       <SeasonScroller
         value={seasonYear}
         onChange={changeSeason}
         note="scroll — updates stats"
       />
 
-      {/* ── Statistics ───────────────────────────── */}
       {statistics.length === 0 && statsError !== null && (
         <div className="mt-6">
           <ErrorPanel message={statsError} onRetry={reload} />
@@ -309,7 +249,7 @@ export default function PlayerProfilePage({
       )}
       {statistics.length > 0 && (
         <div className="mt-6 space-y-6">
-          {/* Total gabungan semua kompetisi pada musim terpilih */}
+
           <div className="rounded-2xl bg-slate-900/80 px-5 py-4 ring-1 ring-white/10">
             <h2 className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
               Season totals · {statsSeason ?? seasonYear}
@@ -334,7 +274,7 @@ export default function PlayerProfilePage({
                 key={stat.league?.id}
                 className="rounded-2xl bg-slate-900/80 ring-1 ring-white/10"
               >
-                {/* League header */}
+
                 <header className="flex flex-wrap items-center gap-3 px-5 py-3.5">
                   <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/5 ring-1 ring-white/10">
                     {stat.league?.logo ? (
@@ -369,7 +309,6 @@ export default function PlayerProfilePage({
                   )}
                 </header>
 
-                {/* Stat tiles */}
                 <div className="flex flex-col gap-4 px-5 py-4">
                   <StatGroup
                     title="Season overview"

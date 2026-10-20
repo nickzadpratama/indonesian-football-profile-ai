@@ -11,13 +11,6 @@ const positionStyles = {
 const DEFAULT_POSITION =
   "bg-slate-400/15 text-slate-300 ring-1 ring-slate-400/30";
 
-/**
- * Player card for the squad list. Middle-size photo (96 px) with an
- * initials fallback. Clicking anywhere on the card opens the player profile
- * & statistics page (/players/:playerId). The player object rides along in
- * location.state so the profile header shows instantly while the statistics
- * are still being fetched (ProfileRoute reads it as location.state.player).
- */
 export default function PlayerCard({ el }) {
   const player = el.players ?? {};
   const positionClass = positionStyles[player.position] ?? DEFAULT_POSITION;
@@ -30,7 +23,7 @@ export default function PlayerCard({ el }) {
       title={`Open ${player.name ?? "player"} profile & stats`}
       className="group flex w-full flex-col overflow-hidden rounded-2xl bg-slate-900/80 text-left ring-1 ring-white/10 shadow-lg shadow-slate-950/40 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-slate-900/50 hover:ring-emerald-400/30"
     >
-      {/* ── Photo (middle size) ───────────────────── */}
+
       <div className="flex flex-col items-center gap-1.5 py-4">
         <Avatar
           src={player.photo}
@@ -45,7 +38,6 @@ export default function PlayerCard({ el }) {
         </span>
       </div>
 
-      {/* ── Name + number ────────────────────────── */}
       <div className="flex items-center gap-3 px-4 py-3">
         <div className="min-w-0 flex-1">
           <h3 className="truncate text-sm font-black tracking-tight text-white">
@@ -60,7 +52,6 @@ export default function PlayerCard({ el }) {
         </span>
       </div>
 
-      {/* ── Footer ────────────────────────────────── */}
       <div className="mt-auto flex items-center justify-center gap-1.5 border-t border-white/10 bg-black/10 py-2.5 text-xs font-bold text-emerald-300 transition group-hover:gap-2">
         View profile &amp; stats
         <span

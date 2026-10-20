@@ -1,7 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import "./ChatBotWidget.css";
+import LoadingIndicator from "./LoadingIndicator.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchAI } from "../features/gemini/geminiSlice";
+import { fetchAI, fetchFailed } from "../features/gemini/geminiSlice";
+import useSessionToken from "../auth/useSessionToken.js";
+import { isTokenValid } from "../auth/session.js";
 
 const WELCOME_MESSAGE = {
   id: "welcome",
@@ -11,6 +14,16 @@ const WELCOME_MESSAGE = {
 };
 
 export default function ChatBotWidget() {
+  const token = useSessionToken();
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(fetchFailed(""));
+  }, [dispatch, token]);
+  if (!isTokenValid(token)) return null;
+  return <AuthenticatedChatBot key={token} />;
+}
+
+function AuthenticatedChatBot() {
   const [isOpen, setIsOpen] = useState(false);
   const { loading, error } = useSelector((state) => state.gemini);
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
@@ -178,11 +191,7 @@ export default function ChatBotWidget() {
               {isProcessing && (
                 <div className="bot-message bot typing-indicator">
                   <div className="bot-bubble">
-                    <div className="typing-dots">
-                      <span />
-                      <span />
-                      <span />
-                    </div>
+                    <LoadingIndicator label="Menyiapkan jawaban…" className="h-16 w-16" />
                   </div>
                 </div>
               )}

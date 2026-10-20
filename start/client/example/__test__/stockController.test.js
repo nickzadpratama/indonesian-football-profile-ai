@@ -17,10 +17,9 @@ const geminiService = require('../services/geminiService');
 let testStock;
 
 beforeAll(async () => {
-  // Clean up
+
   await sequelize.models.Stock.destroy({ where: { symbol: 'CTRL' } });
 
-  // Create test stock
   testStock = await sequelize.models.Stock.create({
     symbol: 'CTRL',
     name: 'Controller Test Stock',
@@ -87,7 +86,7 @@ describe('Stock Controller - getInsight', () => {
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('summary', 'Mock summary');
-    // Fresh insight (< 24h) should not trigger regeneration
+
     expect(geminiService.generateInsight).not.toHaveBeenCalled();
   });
 

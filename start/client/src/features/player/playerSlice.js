@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { getPlayerStatistics } from "../../api/football.js";
 
 export const playerSlice = createSlice({
   name: "player",
@@ -17,7 +18,7 @@ export const playerSlice = createSlice({
     },
     fetchFailed: (state, action) => {
       state.error = action.payload;
-      state.loading = true;
+      state.loading = false;
     },
   },
 });
@@ -25,22 +26,11 @@ export const playerSlice = createSlice({
 export const { fetchPending, fetchSuccess, fetchFailed } = playerSlice.actions;
 
 export const fetchPlayerStatistic = (playerId, season) => async (dispatch) => {
+  dispatch(fetchPending());
   try {
-    dispatch(fetchPending());
-
-    const result = await fetch(
-      `https://v3.football.api-sports.io/players?id=${playerId}&season=${season}`,
-      {
-        method: "GET",
-        headers: { "x-apisports-key": "e194d63f6878ad3c12abc5d1a31cb315" },
-      },
-    );
-
-    const data = await result.json();
-    dispatch(fetchSuccess(data.response));
-    console.log(data.response);
+    dispatch(fetchSuccess(await getPlayerStatistics(playerId, season)));
   } catch (error) {
-    dispatch(fetchFailed(error.message || error));
+    dispatch(fetchFailed(error.message || String(error)));
   }
 };
 

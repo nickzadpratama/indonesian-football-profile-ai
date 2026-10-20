@@ -1,12 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { API_BASE_URL } from "../../api/auth.js";
-
-const GEMINI_API_BASE_URL =
-  import.meta.env.DEV &&
-  /^http:\/\/(localhost|127\.0\.0\.1):3000\/?$/.test(API_BASE_URL)
-    ? ""
-    : API_BASE_URL;
+import { clearToken, getToken, isTokenValid } from "../../auth/session.js";
 
 const initialState = {
   data: "",
@@ -38,6 +33,12 @@ export const geminiSlice = createSlice({
 export const { fetchPending, fetchSuccess, fetchFailed } = geminiSlice.actions;
 
 export const fetchAI = (input) => async (dispatch) => {
+  const token = getToken();
+  if (!isTokenValid(token)) {
+    const message = "Silakan login untuk menggunakan chatbot.";
+    dispatch(fetchFailed(message));
+    return { ok: false, message, status: 401 };
+  }
   const trimmedInput = input?.trim();
 
   if (!trimmedInput) {
@@ -49,8 +50,9 @@ export const fetchAI = (input) => async (dispatch) => {
   try {
     dispatch(fetchPending());
 
-    const result = await axios.get(`${GEMINI_API_BASE_URL}/genAI`, {
+    const result = await axios.get(`${API_BASE_URL}/genAI`, {
       params: { input: trimmedInput },
+      headers: { Authorization: `Bearer ${token}` },
       timeout: 60000,
     });
 
@@ -61,12 +63,15 @@ export const fetchAI = (input) => async (dispatch) => {
       throw new Error("AI tidak memberikan jawaban.");
     }
 
+    if (getToken() !== token) return { ok: false, message: "Sesi telah berubah." };
     dispatch(fetchSuccess(reply));
 
     return { ok: true, message: reply };
   } catch (error) {
     const status = error.response?.status;
     let message = error.response?.data?.message || error.message;
+    if (getToken() !== token) return { ok: false, message: "Sesi telah berubah." };
+    if (status === 401) clearToken();
 
     if (status === 503) {
       message =

@@ -1,9 +1,5 @@
 import { PREMIUM_ONLY_YEAR, SEASON_YEARS } from '../data/seasons.js'
 
-/**
- * Horizontally scrollable year picker — swipe / scroll to change season.
- * `value` = selected year, `onChange(year)` fires on click.
- */
 export default function SeasonScroller({ value, onChange, note = 'applies to profiles' }) {
   return (
     <div className="mt-3 flex items-center gap-2 overflow-hidden rounded-xl bg-white/5 ring-1 ring-white/10">

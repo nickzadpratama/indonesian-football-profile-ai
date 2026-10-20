@@ -11,7 +11,7 @@ describe('User model hooks (no DB)', () => {
       await User.runHooks('beforeUpdate', mockUser, {});
 
       expect(mockUser.password).not.toBe('new-secret');
-      expect(mockUser.password.length).toBeGreaterThan(20); // bcrypt hash
+      expect(mockUser.password.length).toBeGreaterThan(20);
     });
 
     it('should not hash password when password is not changed', async () => {

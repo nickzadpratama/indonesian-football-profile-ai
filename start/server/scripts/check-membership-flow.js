@@ -1,4 +1,3 @@
-// Non-destructive smoke test: creates and removes only its own temporary users.
 require("dotenv").config({ quiet: true });
 const assert = require("node:assert/strict");
 const crypto = require("node:crypto");
